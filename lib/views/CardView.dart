@@ -53,62 +53,13 @@ class CardView extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(10),
         child: SizedBox(
-          height: 90,
+          height: 110,
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Expanded(
-                flex: 2,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Flexible(
-                      child: Text(newsSource!,
-                          maxLines: 1,
-                          textAlign: TextAlign.start,
-                          style: TextStyle(
-                              fontSize: 12)),
-                    ),
-                    Flexible(
-                        flex: 4,
-                        child: Container(
-                          child: Text(title!,
-                              maxLines: 2,
-                              textAlign: TextAlign.start,
-                              style: TextStyle(
-                                  fontSize: 14, fontWeight: FontWeight.bold)),
-                        )),
-                    SizedBox(
-                      child: Text(
-                        dateTime.toString(),
-                        textAlign: TextAlign.start,
-                        style: Theme.of(context).textTheme.caption,
-                      ),
-
-
-                    ),
-
-                  ],
-                ),
-              ),
-              // Expanded(
-              //     child: Padding(
-              //       padding: const EdgeInsets.all(6),
-              //       child: Container(
-              //         height: 80,
-              //         decoration: BoxDecoration(
-              //             borderRadius: BorderRadius.circular(10),
-              //             color: Colors.black,
-              //             image: DecorationImage(
-              //                 image: NetworkImage(image!), fit: BoxFit.fill)),
-              //       ),
-              //     )),
               Expanded(
 
                   child: Container(
-                    width: 200,
-                    margin: EdgeInsets.all(5),
+                    margin: EdgeInsets.all(10),
                     child: Container(
                       child: Container(
                         decoration: BoxDecoration(
@@ -120,35 +71,6 @@ class CardView extends StatelessWidget {
                                     Colors.black.withOpacity(0.6), BlendMode.dstATop),
                                 image: NetworkImage(image!),
                                 fit: BoxFit.fill)),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            Container(
-
-                              child: IconButton(
-                                icon: const Icon(
-                                  Icons.bookmark,
-                                ),
-                                iconSize: 30,
-                                color: Colors.white,
-                                onPressed: () async{
-                                  final database = await $FloorNewsDB.databaseBuilder('NewsDB.db').build();
-
-                                  final bookmarkDao = database.bookmarkDao;
-                                  Fluttertoast.showToast(msg: "Added bookmark successfully!");
-
-                                  Bookmark bookmark=Bookmark(url:image.toString());
-                                  bookmarkDao.addToBookmark(bookmark);
-                                  debugPrint("callBookmarkDB:- $bookmark");
-
-                                },
-                              ),
-                            ),
-
-
-                          ],
-                        ),
                       ),
                     ),
                   )
@@ -186,7 +108,109 @@ class CardView extends StatelessWidget {
 
 
 
-              )
+              ),
+              Expanded(
+                flex: 2,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Flexible(
+                      flex:3,
+                      child: Text(newsSource!,
+                          maxLines: 1,
+                          textAlign: TextAlign.start,
+                          style: TextStyle(
+                              fontSize: 12)),
+                    ),
+                    Flexible(
+                        flex: 7,
+                        child: Container(
+                          margin: EdgeInsets.only(top:5),
+                          child: Text(title!,
+                              maxLines: 2,
+                              textAlign: TextAlign.start,
+                              style: TextStyle(
+                                  fontSize: 14, fontWeight: FontWeight.bold)),
+                        )),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Flexible(
+                          flex: 23,
+                          child: Text(
+                            dateTime.toString(),
+                            textAlign: TextAlign.start,
+                            style: Theme.of(context).textTheme.caption,
+                          ),
+
+
+                        ),
+                        SizedBox(width: 100), // give it width
+
+                        Flexible(
+
+                            flex: 10,
+                            child: IconButton(
+                              icon: const Icon(
+                                Icons.bookmark,
+                              ),
+                              iconSize: 20,
+                              color: Colors.black,
+                              onPressed: () async{
+                                final database = await $FloorNewsDB.databaseBuilder('NewsDB.db').build();
+
+                                final bookmarkDao = database.bookmarkDao;
+                                Fluttertoast.showToast(msg: "Added bookmark successfully!");
+
+                                Bookmark bookmark=Bookmark(url:image.toString());
+                                bookmarkDao.addToBookmark(bookmark);
+                                debugPrint("callBookmarkDB:- $bookmark");
+
+                              },
+                            ),
+                          ),
+
+                  Flexible(
+                            flex: 20,
+                            child: IconButton(
+                              icon: const Icon(
+                                Icons.bookmark,
+                              ),
+                              iconSize: 20,
+                              color: Colors.black,
+                              onPressed: () {
+
+
+                              },
+                            ),
+                          )
+
+
+
+
+
+
+
+
+                      ],
+                    )
+
+                  ],
+                ),
+              ),
+              // Expanded(
+              //     child: Padding(
+              //       padding: const EdgeInsets.all(6),
+              //       child: Container(
+              //         height: 80,
+              //         decoration: BoxDecoration(
+              //             borderRadius: BorderRadius.circular(10),
+              //             color: Colors.black,
+              //             image: DecorationImage(
+              //                 image: NetworkImage(image!), fit: BoxFit.fill)),
+              //       ),
+              //     )),
 
             ],
           ),

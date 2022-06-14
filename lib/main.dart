@@ -8,6 +8,7 @@ import 'package:newsdemoapp/helper/NewsDao.dart';
 import 'package:newsdemoapp/views/homepage.dart';
 
 import 'helper/NewsDB.dart';
+import 'helper/ThemeClas.dart';
 
 
 Future<void> main() async {
@@ -25,16 +26,23 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
 
 
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
         title: 'Flutter Demo',
         debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-        primaryColor: Colors.white,
-    ),
-    home:HomePage()
+    //     theme: ThemeData(
+    //     primaryColor: Colors.white,
+    //       brightness: Brightness.light
+    // ),
+    //     darkTheme: ThemeData(
+    //       brightness: Brightness.dark,
+    //       /* dark theme settings */
+    //     ),
+        themeMode: ThemeMode.light,
+        theme: ThemeClas.lightTheme,
+        darkTheme: ThemeClas.darkTheme,
+        home:HomePage()
     );
     }
 }

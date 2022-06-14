@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:newsdemoapp/views/Profile.dart';
 import 'package:newsdemoapp/views/article_view.dart';
-
+import 'package:page_transition/page_transition.dart';
 import '../views/CardView.dart';
 
 PreferredSizeWidget MyAppBar() {
@@ -60,16 +60,19 @@ class NewsTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
         onTap: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => ArticleView(
-                        postUrl: posturl,
-                      )));
+
+          Navigator.push(context, PageTransition(type: PageTransitionType.bottomToTop, child: ArticleView(postUrl: posturl)));
+
+          // Navigator.push(
+          //     context,
+          //     MaterialPageRoute(
+          //         builder: (context) => ArticleView(
+          //               postUrl: posturl,
+          //             )));
         },
         child: Container(
             child: Padding(
-          padding: EdgeInsets.only(left: 10, right: 10),
+          padding: const EdgeInsets.only(left: 10, right: 10),
           child: CardView(
             newsSource: author,
             image: imgUrl,

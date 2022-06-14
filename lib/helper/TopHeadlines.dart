@@ -20,7 +20,6 @@ class TopHeadlines {
     debugPrint("Minus Date :- ${formatter.format(newDate)}");
 
     var url = "https://newsapi.org/v2/top-headlines?sources=techcrunch&apiKey=$apiKey";
-    // throw Exception("This is a crash!");
 
     var response = await http.get(Uri.parse(url));
 
@@ -37,7 +36,6 @@ class TopHeadlines {
             content: element["content"],
             articleUrl: element["url"],
           );
-    debugPrint('topHeald: ${element['title']}');
           news.add(article);
         }
       });

@@ -95,6 +95,7 @@ class _HomePageState extends State<HomePage> {
     // var convertedTimestamp = DateTime.parse(
     //     news.news[0].publshedAt); // Converting into [DateTime] object
     // var result = GetTimeAgo.parse(convertedTimestamp);
+    debugPrint("topHeadlines:- ${topHeadlines.news.toString()}");
   }
 
   final RefreshController _refreshController =
@@ -123,21 +124,18 @@ class _HomePageState extends State<HomePage> {
       urls.add(e.url);
     }
     debugPrint("callBookmarkDB:- ${bookmarkData.length}");
-    finalBookmarkList=(await personDao.getBookmark(urls))!;
-      debugPrint("completeBookData1 :- ${urls.toString()}");
-      removeDuplicates(finalBookmarkList);
-      for(TodaysNews e in finalBookmarkList!)
-        {
-
+    finalBookmarkList = (await personDao.getBookmark(urls))!;
+    debugPrint("completeBookData1 :- ${urls.toString()}");
+    removeDuplicates(finalBookmarkList);
+    for (TodaysNews e in finalBookmarkList!) {
       debugPrint("finalBookMark :- ${e.title}");
-        }
+    }
   }
 
   void callDB() async {
     final database = await $FloorNewsDB.databaseBuilder('NewsDB.db').build();
 
     final personDao = database.newsDao;
-
 
     news2 = await personDao.findAllPersons();
     debugPrint("bookmark222:- ${news2.length}");
@@ -172,13 +170,15 @@ class _HomePageState extends State<HomePage> {
     getNews();
     getTopHeadlineNews();
     callDB();
-    // callBookmarDB();
+    callBookmark();
   }
 
   void _onRefresh() async {
     await Future.delayed(const Duration(seconds: 1));
     getNews();
     getTopHeadlineNews();
+    callDB();
+    callBookmark();
     _refreshController.refreshCompleted();
   }
 
@@ -191,6 +191,8 @@ class _HomePageState extends State<HomePage> {
 
   void _onLoading() async {
     // monitor network fetch
+    callDB();
+    callBookmark();
     await Future.delayed(Duration(milliseconds: 1000));
     // if failed,use loadFailed(),if no data return,use LoadNodata()
 
@@ -361,10 +363,9 @@ class _HomePageState extends State<HomePage> {
 
         break;
       case 1:
-
         callBookmark();
 
-        child= ListView.builder(
+        child = ListView.builder(
             itemCount: finalBookmarkList.length,
             shrinkWrap: true,
             physics: ClampingScrollPhysics(),
@@ -379,7 +380,7 @@ class _HomePageState extends State<HomePage> {
               }
 
               final contact = removeDuplicates(finalBookmarkList)[index];
-debugPrint("NewsDatabseB:- ${finalBookmarkList.length}");
+              debugPrint("NewsDatabseB:- ${finalBookmarkList.length}");
               return NewsTile(
                   imgUrl: contact.urlToImage ?? "",
                   title: contact.title ?? "",

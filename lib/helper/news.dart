@@ -28,6 +28,7 @@ class News {
     news.clear();
     var url =
         "https://newsapi.org/v2/everything?q=apple&from=$formattedDate1&to=${formattedDate2}&sortBy=popularity&apiKey=$apiKey";
+    debugPrint('topHeald: ${url}');
 
     var response = await http.get(Uri.parse(url));
     debugPrint(
@@ -101,7 +102,7 @@ class NewsForCategorie {
     var response = await http.get(Uri.parse(url));
     news.clear();
     var jsonData = jsonDecode(response.body);
-
+    debugPrint("listofCalender:= ${url}");
     if (jsonData['status'] == "ok") {
       jsonData["articles"].forEach((element) {
         if (element['urlToImage'] != null && element['description'] != null) {

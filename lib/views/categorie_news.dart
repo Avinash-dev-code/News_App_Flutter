@@ -4,6 +4,9 @@ import 'package:newsdemoapp/helper/news.dart';
 import 'package:newsdemoapp/helper/widgets.dart';
 import 'package:get_time_ago/get_time_ago.dart';
 
+import '../helper/NewsDB.dart';
+import '../models/TodaysNews.dart';
+
 class CategoryNews extends StatefulWidget {
   final String newsCategory;
 
@@ -18,6 +21,7 @@ class _CategoryNewsState extends State<CategoryNews> {
   bool _loading = true;
   NewsForCategorie news = NewsForCategorie();
   DateTime currentDate = DateTime.now();
+  List<TodaysNews> news2 = [];
   @override
   void initState() {
     getNews();
@@ -31,8 +35,8 @@ class _CategoryNewsState extends State<CategoryNews> {
     String formattedDate1 = formatter.format(tempDate2);
 
     await news.getNewsForCategory(widget.newsCategory,formattedDate1,formattedDate1);
-
-    newslist = news.news;
+    debugPrint("calenderDate:- ${formattedDate1}");
+    newslist = news2;
     setState(() {
       _loading = false;
     });
@@ -47,6 +51,7 @@ class _CategoryNewsState extends State<CategoryNews> {
       setState(() {
         currentDate = pickedDate;
         getNews();
+
       });
     }
   }
@@ -55,6 +60,7 @@ class _CategoryNewsState extends State<CategoryNews> {
         letter[0].toUpperCase() + letter.substring(1).toLowerCase();
     return finalLetter;
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -67,10 +73,10 @@ class _CategoryNewsState extends State<CategoryNews> {
             Text(
               firstLetter(widget.newsCategory),
               style:
-                  TextStyle(color: Colors.black87, fontWeight: FontWeight.w600),
+                  const TextStyle(color: Colors.black87, fontWeight: FontWeight.w600),
             ),
             const SizedBox(width: 5),
-            Text(
+            const Text(
               "News",
               style: TextStyle(color: Colors.blue, fontWeight: FontWeight.w600),
             )
@@ -104,8 +110,7 @@ class _CategoryNewsState extends State<CategoryNews> {
                         shrinkWrap: true,
                         physics: ClampingScrollPhysics(),
                         itemBuilder: (context, index) {
-                          var convertedTimestamp = DateTime.parse(news
-                              .news[index]
+                          var convertedTimestamp = DateTime.parse(news.news[index]
                               .publshedAt); // Converting into [DateTime] object
                           var result = GetTimeAgo.parse(convertedTimestamp);
                           if(result==("a day ago"))
@@ -131,7 +136,7 @@ class _CategoryNewsState extends State<CategoryNews> {
             ),
 
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.calendar_today),
+        child: const Icon(Icons.calendar_today),
         backgroundColor: Colors.blue,
         onPressed: () {
           selectDate(context);
