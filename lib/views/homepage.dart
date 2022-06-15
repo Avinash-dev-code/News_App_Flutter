@@ -1,7 +1,12 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:hive/hive.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:newsdemoapp/helper/NewsDao.dart';
 import 'package:newsdemoapp/helper/TopHeadlines.dart';
@@ -48,6 +53,10 @@ class _HomePageState extends State<HomePage> {
   String formattedDate = "";
   late final newsDao;
   late final database;
+  File imageFile = File("");
+  var locationMessage = '';
+  String latitude = "";
+  String longitude = "";
 
   void getNews() async {
     WidgetsFlutterBinding.ensureInitialized();
@@ -229,6 +238,124 @@ class _HomePageState extends State<HomePage> {
   //   //     }
   //   //   }
   // }
+  Future<Position> _determinePosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    // Test if location services are enabled.
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      // Location services are not enabled don't continue
+      // accessing the position and request users of the
+      // App to enable the location services.
+      return Future.error('Location services are disabled.');
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        // Permissions are denied, next time you could try
+        // requesting permissions again (this is also where
+        // Android's shouldShowRequestPermissionRationale
+        // returned true. According to Android guidelines
+        // your App should show an explanatory UI now.
+        return Future.error('Location permissions are denied');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      // Permissions are denied forever, handle appropriately.
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
+
+    // When we reach here, permissions are granted and we can
+    // continue accessing the position of the device.
+    var position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    var lat = position.latitude;
+    var long = position.longitude;
+
+    // passing this to latitude and longitude strings
+    latitude = "$lat";
+    longitude = "$long";
+    // getNamebyCordinates();
+    // if (lat == null || long == null) return double.parse("");
+
+    List<Placemark> placemarks =
+        await placemarkFromCoordinates(position.latitude, position.longitude);
+    debugPrint("location :- $placemarks $latitude  $longitude");
+    setState(() {
+      locationMessage = "${placemarks[0].locality}";
+    });
+    return await Geolocator.getCurrentPosition();
+  }
+
+  getFromCamera() async {
+    var image = await ImagePicker().pickImage(source: ImageSource.camera);
+    if (image != null) {
+      debugPrint("Camera Image:-  $image");
+
+      setState(() {
+        imageFile = File(image.path);
+      });
+    }
+  }
+
+  getFromGallery() async {
+    var image = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      debugPrint("Gallery Image:-  $image");
+      // imageFile = File(image.path);
+      setState(() {
+        imageFile = File(image.path);
+      });
+    }
+  }
+
+  showAlertDialog(BuildContext context) {
+    // Navigator.of(context, rootNavigator: true).pop('dialog');
+    // set up the button
+    Widget remindButton, launchButton;
+    Widget ui = Row(
+      mainAxisSize: MainAxisSize.max,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: <Widget>[
+        SizedBox(width: 10),
+        remindButton = TextButton(
+          child: Text("Camera"),
+          onPressed: () {
+            getFromCamera();
+            Navigator.of(context, rootNavigator: true).pop('dialog');
+          },
+        ),
+        SizedBox(width: 110),
+        launchButton = TextButton(
+          child: Text("Gallery"),
+          onPressed: () {
+            getFromGallery();
+            Navigator.of(context, rootNavigator: true).pop('dialog');
+          },
+        )
+      ],
+    );
+
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Center(child: Text("Image Picker")),
+      actions: [ui],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -393,6 +520,80 @@ class _HomePageState extends State<HomePage> {
 
         break;
       case 2:
+        child = Container(
+            height: 500,
+            child:
+            Column(children: <Widget>[
+              Stack(
+                children: <Widget>[
+                  Container(
+                    height: 200,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.black,
+                        image: DecorationImage(
+                            colorFilter: ColorFilter.mode(
+                                Colors.black.withOpacity(0.6), BlendMode.dstATop),
+                            image: NetworkImage(
+                                "https://www.pixel4k.com/wp-content/uploads/2018/10/material-design-4k_1539370636-2048x1152.jpg"),
+                            fit: BoxFit.fill)),
+                  ),
+                  Column(
+                    mainAxisSize: MainAxisSize.max,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Container(
+                          width: 250,
+
+                          margin: const EdgeInsets.only(left: 50, top: 130),
+                          child: Column(
+                            children: <Widget>[
+                              GestureDetector(
+                                onTap: () {
+                                  //Do something
+                                  // getFromCamera();
+                                  showAlertDialog(context);
+                                },
+                                child: CircleAvatar(
+                                  radius: 60,
+                                  backgroundImage: Image.file(
+                                    imageFile,
+                                  ).image,
+                                ),
+                              ),
+                              Text(
+                                "Avinash",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 20),
+                              ),
+
+                            ],
+                          )),
+                    ],
+                  ),
+                ],
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  _determinePosition();
+                },
+                child: const Text("Get User Location"),
+              ),
+              const SizedBox(
+                height: 18,
+              ),
+
+              Text(
+                "locationMessage",
+                style: const TextStyle(
+                  fontSize: 18,
+                  color: Colors.blue,
+                ),
+              ),
+            ],)
+
+           );
+
         break;
     }
     return Scaffold(

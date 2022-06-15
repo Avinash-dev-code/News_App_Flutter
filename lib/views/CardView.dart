@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_share/flutter_share.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:newsdemoapp/models/Bookmark.dart';
 
@@ -10,22 +11,32 @@ class CardView extends StatelessWidget {
   String? image;
   String? title;
   String? dateTime;
+  String? articleURL;
   List<TodaysNews> news2 = [];
-
+  bool isClick = false;
 
   CardView({
     required this.newsSource,
     required this.image,
     required this.title,
     required this.dateTime,
+    required this.articleURL,
+
   });
+  Future<void> share() async {
+    await FlutterShare.share(
+        title: 'Share Article',
+        linkUrl: articleURL,
+        chooserTitle: 'Example Chooser Title'
+    );
+  }
+
   void callDB(Bookmark bookmark) async {
     final database = await $FloorNewsDB.databaseBuilder('NewsDB.db').build();
 
     final bookmarkDao = database.bookmarkDao;
 
     bookmarkDao.addToBookmark(bookmark);
-
 
     debugPrint("callDB:- $bookmark");
     //
@@ -57,58 +68,21 @@ class CardView extends StatelessWidget {
           child: Row(
             children: [
               Expanded(
-
                   child: Container(
-                    margin: EdgeInsets.all(10),
-                    child: Container(
-                      child: Container(
-                        decoration: BoxDecoration(
+                margin: EdgeInsets.all(10),
+                child: Container(
+                  margin: const EdgeInsets.only(top: 5,bottom: 5),
+                  decoration: BoxDecoration(
+                       shape: BoxShape.rectangle,
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.black,
+                      image: DecorationImage(
 
-                            borderRadius: BorderRadius.circular(10),
-                            color: Colors.black,
-                            image: DecorationImage(
-                                colorFilter: ColorFilter.mode(
-                                    Colors.black.withOpacity(0.6), BlendMode.dstATop),
-                                image: NetworkImage(image!),
-                                fit: BoxFit.fill)),
-                      ),
-                    ),
-                  )
+                          image: NetworkImage(image!),
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-              ),
+                          fit: BoxFit.fill)),
+                ),
+              )),
               Expanded(
                 flex: 2,
                 child: Column(
@@ -116,17 +90,16 @@ class CardView extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Flexible(
-                      flex:3,
+                      flex: 3,
                       child: Text(newsSource!,
                           maxLines: 1,
                           textAlign: TextAlign.start,
-                          style: TextStyle(
-                              fontSize: 12)),
+                          style: const TextStyle(fontSize: 12)),
                     ),
                     Flexible(
                         flex: 7,
                         child: Container(
-                          margin: EdgeInsets.only(top:5),
+                          margin: EdgeInsets.only(top: 5),
                           child: Text(title!,
                               maxLines: 2,
                               textAlign: TextAlign.start,
@@ -134,68 +107,48 @@ class CardView extends StatelessWidget {
                                   fontSize: 14, fontWeight: FontWeight.bold)),
                         )),
                     Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Flexible(
-                          flex: 23,
+                        Container(
+                          width: 85,
                           child: Text(
                             dateTime.toString(),
+                            maxLines: 1,
                             textAlign: TextAlign.start,
                             style: Theme.of(context).textTheme.caption,
                           ),
-
-
                         ),
-                        SizedBox(width: 100), // give it width
-
-                        Flexible(
-
-                            flex: 10,
-                            child: IconButton(
-                              icon: const Icon(
-                                Icons.bookmark,
-                              ),
-                              iconSize: 20,
-                              color: Colors.black,
-                              onPressed: () async{
-                                final database = await $FloorNewsDB.databaseBuilder('NewsDB.db').build();
-
-                                final bookmarkDao = database.bookmarkDao;
-                                Fluttertoast.showToast(msg: "Added bookmark successfully!");
-
-                                Bookmark bookmark=Bookmark(url:image.toString());
-                                bookmarkDao.addToBookmark(bookmark);
-                                debugPrint("callBookmarkDB:- $bookmark");
-
-                              },
+                        SizedBox(width: 10),
+                        Container(
+                          child: TextButton(
+                           onPressed: () {
+                             share();
+                           }, child: Text("Share"),),
+                        ),
+                        Container(
+                          child: IconButton(
+                            icon: const Icon(
+                              Icons.bookmark,
                             ),
+                            iconSize: 20,
+                            color: Colors.black,
+                            onPressed: () async {
+                              final database = await $FloorNewsDB
+                                  .databaseBuilder('NewsDB.db')
+                                  .build();
+
+                              final bookmarkDao = database.bookmarkDao;
+                              Fluttertoast.showToast(
+                                  msg: "Added bookmark successfully!");
+
+                              Bookmark bookmark =
+                                  Bookmark(url: image.toString());
+                              bookmarkDao.addToBookmark(bookmark);
+                              debugPrint("callBookmarkDB:- $bookmark");
+                            },
                           ),
-
-                  Flexible(
-                            flex: 20,
-                            child: IconButton(
-                              icon: const Icon(
-                                Icons.bookmark,
-                              ),
-                              iconSize: 20,
-                              color: Colors.black,
-                              onPressed: () {
-
-
-                              },
-                            ),
-                          )
-
-
-
-
-
-
-
-
+                        )
                       ],
                     )
-
                   ],
                 ),
               ),
@@ -211,7 +164,6 @@ class CardView extends StatelessWidget {
               //                 image: NetworkImage(image!), fit: BoxFit.fill)),
               //       ),
               //     )),
-
             ],
           ),
         ),
@@ -219,4 +171,3 @@ class CardView extends StatelessWidget {
     );
   }
 }
-

@@ -78,6 +78,7 @@ class NewsTile extends StatelessWidget {
             image: imgUrl,
             title: title,
             dateTime: publishAt,
+            articleURL: posturl,
           ),
         )));
   }

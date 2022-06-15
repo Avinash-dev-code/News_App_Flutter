@@ -31,17 +31,15 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
         title: 'Flutter Demo',
         debugShowCheckedModeBanner: false,
-    //     theme: ThemeData(
-    //     primaryColor: Colors.white,
-    //       brightness: Brightness.light
-    // ),
-    //     darkTheme: ThemeData(
-    //       brightness: Brightness.dark,
-    //       /* dark theme settings */
-    //     ),
+        theme: ThemeData(
+        primaryColor: Colors.white,
+          brightness: Brightness.light
+    ),
+        darkTheme: ThemeData(
+          brightness: Brightness.dark,
+          /* dark theme settings */
+        ),
         themeMode: ThemeMode.light,
-        theme: ThemeClas.lightTheme,
-        darkTheme: ThemeClas.darkTheme,
         home:HomePage()
     );
     }
