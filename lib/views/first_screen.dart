@@ -30,7 +30,7 @@ class FirstScreen extends StatelessWidget {
                 backgroundColor: Colors.transparent,
               ),
               SizedBox(height: 40),
-              Text(
+              const Text(
                 'NAME',
                 style: TextStyle(
                     fontSize: 15,

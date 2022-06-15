@@ -1,14 +1,19 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:newsdemoapp/views/Profile.dart';
 import 'package:newsdemoapp/views/article_view.dart';
 import 'package:page_transition/page_transition.dart';
 import '../views/CardView.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-PreferredSizeWidget MyAppBar() {
+PreferredSizeWidget MyAppBar(String image) {
 
   return AppBar(
     iconTheme: const IconThemeData(color: Colors.black),
-    title: Row(children: <Widget>[
+    title: Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+
       Container(
           width: 25,
           child: const Padding(
@@ -22,22 +27,20 @@ PreferredSizeWidget MyAppBar() {
             textAlign: TextAlign.start,
             style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600),
           )),
+      SizedBox(width: 60),
       Container(
-          width: 40,
-        margin: EdgeInsets.only(left: 55),
+        width: 40,
         alignment: Alignment.topRight,
-
-          child:GestureDetector(
+        child: GestureDetector(
             onTap: () {
+              debugPrint("avatar:- $image");
             },
-              child:const CircleAvatar(
-                radius: 30.0,
-                backgroundImage:
-                NetworkImage("https://w7.pngwing.com/pngs/550/997/png-transparent-user-icon-foreigners-avatar-child-face-heroes.png"),
-                backgroundColor: Colors.transparent,
-              )),
-          ),
-
+            child: CircleAvatar(
+              radius: 30.0,
+              backgroundImage: CachedNetworkImageProvider(image),
+              backgroundColor: Colors.transparent,
+            )),
+      ),
     ]),
     backgroundColor: Colors.transparent,
     elevation: 0.0,
@@ -60,8 +63,11 @@ class NewsTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
         onTap: () {
-
-          Navigator.push(context, PageTransition(type: PageTransitionType.bottomToTop, child: ArticleView(postUrl: posturl)));
+          Navigator.push(
+              context,
+              PageTransition(
+                  type: PageTransitionType.bottomToTop,
+                  child: ArticleView(postUrl: posturl)));
 
           // Navigator.push(
           //     context,
@@ -118,7 +124,7 @@ class NewsTile2 extends StatelessWidget {
                   image: DecorationImage(
                       colorFilter: ColorFilter.mode(
                           Colors.black.withOpacity(0.6), BlendMode.dstATop),
-                      image: NetworkImage(imgUrl1),
+                      image: CachedNetworkImageProvider(imgUrl1),
                       fit: BoxFit.fill)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -162,7 +168,6 @@ class NewsTile2 extends StatelessWidget {
   }
 }
 
-
 class BookmarkTile extends StatelessWidget {
   final String imgUrl1, title1, desc1, content1, posturl1, publishAt1, author1;
 
@@ -197,7 +202,7 @@ class BookmarkTile extends StatelessWidget {
                   image: DecorationImage(
                       colorFilter: ColorFilter.mode(
                           Colors.black.withOpacity(0.6), BlendMode.dstATop),
-                      image: NetworkImage(imgUrl1),
+                      image: CachedNetworkImageProvider(imgUrl1),
                       fit: BoxFit.fill)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

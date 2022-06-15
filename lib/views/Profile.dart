@@ -170,7 +170,7 @@ class ProfileState extends State<Profile> {
                             getFromCamera();
                           },
                           child: const Icon(Icons.camera_alt)),
-                      Text(
+                      const Text(
                         "Camera",
                         maxLines: 1,
                         style: TextStyle(

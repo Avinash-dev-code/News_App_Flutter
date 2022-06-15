@@ -3,12 +3,13 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:hive/hive.dart';
+import 'package:newsdemoapp/views/sign_in.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:newsdemoapp/helper/NewsDao.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:newsdemoapp/helper/TopHeadlines.dart';
 import 'package:newsdemoapp/helper/data.dart';
 import 'package:newsdemoapp/helper/widgets.dart';
@@ -57,6 +58,8 @@ class _HomePageState extends State<HomePage> {
   var locationMessage = '';
   String latitude = "";
   String longitude = "";
+  String userName = "";
+  String photo = "";
 
   void getNews() async {
     WidgetsFlutterBinding.ensureInitialized();
@@ -177,6 +180,7 @@ class _HomePageState extends State<HomePage> {
     var formatter = DateFormat('yyyy-MM-dd');
     formattedDate = formatter.format(now);
     categories = getCategories();
+    getName();
     getNews();
     getTopHeadlineNews();
     callDB();
@@ -244,12 +248,22 @@ class _HomePageState extends State<HomePage> {
     LocationPermission permission;
 
     // Test if location services are enabled.
+    Geolocator.requestPermission();
 
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       // Location services are not enabled don't continue
       // accessing the position and request users of the
       // App to enable the location services.
+      Fluttertoast.showToast(
+          msg: "This is a Toast message",  // message
+          toastLength: Toast.LENGTH_SHORT, // length
+          gravity: ToastGravity.CENTER,    // location
+          timeInSecForIosWeb: 1               // duration
+      );
+      Geolocator.openLocationSettings();
+
+
       return Future.error('Location services are disabled.');
     }
 
@@ -262,12 +276,15 @@ class _HomePageState extends State<HomePage> {
         // Android's shouldShowRequestPermissionRationale
         // returned true. According to Android guidelines
         // your App should show an explanatory UI now.
+
         return Future.error('Location permissions are denied');
       }
     }
 
     if (permission == LocationPermission.deniedForever) {
       // Permissions are denied forever, handle appropriately.
+      Geolocator.openLocationSettings();
+
       return Future.error(
           'Location permissions are permanently denied, we cannot request permissions.');
     }
@@ -289,7 +306,7 @@ class _HomePageState extends State<HomePage> {
         await placemarkFromCoordinates(position.latitude, position.longitude);
     debugPrint("location :- $placemarks $latitude  $longitude");
     setState(() {
-      locationMessage = "${placemarks[0].locality}";
+      locationMessage = "${placemarks[0].subLocality},${placemarks[0].locality}";
     });
     return await Geolocator.getCurrentPosition();
   }
@@ -357,7 +374,13 @@ class _HomePageState extends State<HomePage> {
       },
     );
   }
-
+  Future<void> getName() async
+  {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    userName=prefs.getString("name")!;
+    photo=prefs.getString("photo")!;
+    debugPrint("isPhoto:= $userName $photo");
+  }
   @override
   Widget build(BuildContext context) {
     Widget? child = null;
@@ -383,8 +406,8 @@ class _HomePageState extends State<HomePage> {
                           fontStyle: FontStyle.normal,
                           fontWeight: FontWeight.normal),
                     ),
-                    const Text(
-                      "Welcome  \nAvinash",
+                     Text(
+                      "Welcome \n$userName",
                       textAlign: TextAlign.start,
                       style: TextStyle(
                           color: Colors.black,
@@ -536,18 +559,14 @@ class _HomePageState extends State<HomePage> {
                         image: DecorationImage(
                             colorFilter: ColorFilter.mode(
                                 Colors.black.withOpacity(0.6), BlendMode.dstATop),
-                            image: NetworkImage(
-                                "https://www.pixel4k.com/wp-content/uploads/2018/10/material-design-4k_1539370636-2048x1152.jpg"),
+                            image:  CachedNetworkImageProvider(
+                                imageFile.path),
                             fit: BoxFit.fill)),
                   ),
-                  Column(
-                    mainAxisSize: MainAxisSize.max,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      Container(
-                          width: 250,
 
-                          margin: const EdgeInsets.only(left: 50, top: 130),
+                      Container(
+                          alignment: Alignment.center,
+                          margin: const EdgeInsets.only(top: 130),
                           child: Column(
                             children: <Widget>[
                               GestureDetector(
@@ -558,37 +577,35 @@ class _HomePageState extends State<HomePage> {
                                 },
                                 child: CircleAvatar(
                                   radius: 60,
-                                  backgroundImage: Image.file(
-                                    imageFile,
-                                  ).image,
+                                  backgroundImage: CachedNetworkImageProvider(photo),
                                 ),
                               ),
+                              SizedBox(height: 10),
                               Text(
-                                "Avinash",
+                                userName,
                                 style: TextStyle(
                                     fontWeight: FontWeight.bold, fontSize: 20),
                               ),
 
                             ],
                           )),
-                    ],
-                  ),
+
                 ],
               ),
               ElevatedButton(
                 onPressed: () {
                   _determinePosition();
                 },
-                child: const Text("Get User Location"),
+                child: const Text("Get Current Location"),
               ),
               const SizedBox(
-                height: 18,
+                height: 20,
               ),
 
               Text(
                 locationMessage,
                 style: const TextStyle(
-                  fontSize: 18,
+                  fontSize: 20,
                   color: Colors.blue,
                 ),
               ),
@@ -599,7 +616,7 @@ class _HomePageState extends State<HomePage> {
         break;
     }
     return Scaffold(
-      appBar: MyAppBar(),
+      appBar: MyAppBar(photo),
       body: SafeArea(
           child: SmartRefresher(
               controller: _refreshController,

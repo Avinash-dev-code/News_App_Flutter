@@ -21,6 +21,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
 final GoogleSignIn googleSignIn = GoogleSignIn();
@@ -28,9 +29,12 @@ final GoogleSignIn googleSignIn = GoogleSignIn();
 String name="";
 String email="";
 String imageUrl="";
+late SharedPreferences prefs;
 
 Future<String?> signInWithGoogle() async {
   await Firebase.initializeApp();
+
+   prefs = await SharedPreferences.getInstance();
 
   final GoogleSignInAccount? googleSignInAccount = await googleSignIn.signIn();
   final GoogleSignInAuthentication? googleSignInAuthentication =
@@ -46,6 +50,7 @@ Future<String?> signInWithGoogle() async {
   final User? user = authResult.user;
 
   if (user != null) {
+    prefs.setBool("isLogged", true);
     // Checking if email and name is null
     assert(user.email != null);
     assert(user.displayName != null);
@@ -54,11 +59,12 @@ Future<String?> signInWithGoogle() async {
     name = user.displayName!;
     email = user.email!;
     imageUrl = user.photoURL!;
-
     // Only taking the first part of the name, i.e., First Name
     if (name.contains(" ")) {
       name = name.substring(0, name.indexOf(" "));
     }
+      prefs.setString("name", name);
+      prefs.setString("photo", imageUrl);
 
     assert(!user.isAnonymous);
     assert(await user.getIdToken() != null);
@@ -76,6 +82,7 @@ Future<String?> signInWithGoogle() async {
 
 Future<void> signOutGoogle() async {
   await googleSignIn.signOut();
+  prefs.setBool("isLogged", false);
 
   print("User Signed Out");
 }

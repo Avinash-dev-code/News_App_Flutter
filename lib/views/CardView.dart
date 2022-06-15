@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_share/flutter_share.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -78,7 +79,7 @@ class CardView extends StatelessWidget {
                       borderRadius: BorderRadius.circular(10),
                       color: Colors.black,
                       image: DecorationImage(
-                          image: NetworkImage(image!), fit: BoxFit.fill)),
+                          image: CachedNetworkImageProvider(image!), fit: BoxFit.fill)),
                 ),
               )),
               Expanded(

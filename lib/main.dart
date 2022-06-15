@@ -7,6 +7,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:newsdemoapp/helper/NewsDao.dart';
 import 'package:newsdemoapp/views/homepage.dart';
 import 'package:newsdemoapp/views/login_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'helper/NewsDB.dart';
 import 'helper/ThemeClas.dart';
@@ -52,18 +53,26 @@ class SplashScreen extends StatefulWidget {
 }
 
 class SplashScreenState extends State<SplashScreen> {
-
+  bool islogged=false;
   @override
   void initState() {
     super.initState();
+    getLogged();
     Timer(const Duration(seconds: 3),
             () =>
             Navigator.pushReplacement(context,
                 MaterialPageRoute(builder:
-                    (context) => HomePage()
+                    (context) => islogged?HomePage():LoginPage()
                 )
             )
     );
+  }
+
+  Future<bool?> getLogged() async
+  {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    islogged=prefs.getBool("isL1ogged")!;
+    debugPrint("isLogged:= $islogged");
   }
 
   @override
