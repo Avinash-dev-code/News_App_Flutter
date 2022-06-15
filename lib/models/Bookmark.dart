@@ -9,6 +9,7 @@ class Bookmark{
 
   String url;
 
+
   Bookmark({this.id,required this.url});
 
 

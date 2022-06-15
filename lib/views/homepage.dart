@@ -111,11 +111,14 @@ class _HomePageState extends State<HomePage> {
       RefreshController(initialRefresh: false);
 
   void _onItemTapped(int index) {
+
+
     setState(() {
       selectedIndex = index;
       debugPrint("SelectedList:- $selectedIndex");
       if (selectedIndex == 0) {
       } else if (selectedIndex == 1) {
+        _onRefresh();
         isHomeVisible = true;
       } else {}
     });
@@ -136,9 +139,7 @@ class _HomePageState extends State<HomePage> {
     finalBookmarkList = (await personDao.getBookmark(urls))!;
     debugPrint("completeBookData1 :- ${urls.toString()}");
     removeDuplicates(finalBookmarkList);
-    for (TodaysNews e in finalBookmarkList!) {
-      debugPrint("finalBookMark :- ${e.title}");
-    }
+
   }
 
   void callDB() async {
@@ -490,7 +491,8 @@ class _HomePageState extends State<HomePage> {
 
         break;
       case 1:
-        callBookmark();
+        // callDB();
+        // callBookmark();
 
         child = ListView.builder(
             itemCount: finalBookmarkList.length,
@@ -584,7 +586,7 @@ class _HomePageState extends State<HomePage> {
               ),
 
               Text(
-                "locationMessage",
+                locationMessage,
                 style: const TextStyle(
                   fontSize: 18,
                   color: Colors.blue,

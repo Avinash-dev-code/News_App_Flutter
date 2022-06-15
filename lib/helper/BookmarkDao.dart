@@ -10,6 +10,11 @@ abstract class BookmarkDao {
   @Query('SELECT * FROM Bookmark')
   Future<List<Bookmark>> getAllBookmark();
 
+  @Query("DELETE FROM Bookmark WHERE url = :url")
+  Future<void> deleteBookmark(String url);
+
+
+
   @Insert()
   Future<void> addToBookmark(Bookmark bookmark);
 }

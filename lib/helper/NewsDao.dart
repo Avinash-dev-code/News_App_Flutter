@@ -21,6 +21,8 @@ abstract class NewsDao {
   @Query('DELETE FROM TodaysNews')
   Future<void> truncateTable();
 
+
+
   @Query("UPDATE TodaysNews SET author=:author,description=:description,urlToImage=:urlToImage,publshedAt=:publshedAt,content=:content,articleUrl=:articleUrl WHERE title =:title")
   Future<void> update(String title, String author, String description,
       String urlToImage, String publshedAt, String content, String articleUrl);

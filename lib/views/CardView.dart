@@ -5,6 +5,7 @@ import 'package:newsdemoapp/models/Bookmark.dart';
 
 import '../helper/NewsDB.dart';
 import '../models/TodaysNews.dart';
+import 'package:like_button/like_button.dart';
 
 class CardView extends StatelessWidget {
   String? newsSource;
@@ -21,14 +22,13 @@ class CardView extends StatelessWidget {
     required this.title,
     required this.dateTime,
     required this.articleURL,
-
   });
+
   Future<void> share() async {
     await FlutterShare.share(
         title: 'Share Article',
         linkUrl: articleURL,
-        chooserTitle: 'Example Chooser Title'
-    );
+        chooserTitle: 'Example Chooser Title');
   }
 
   void callDB(Bookmark bookmark) async {
@@ -58,6 +58,7 @@ class CardView extends StatelessWidget {
     //   }
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -71,16 +72,13 @@ class CardView extends StatelessWidget {
                   child: Container(
                 margin: EdgeInsets.all(10),
                 child: Container(
-                  margin: const EdgeInsets.only(top: 5,bottom: 5),
+                  margin: const EdgeInsets.only(top: 5, bottom: 5),
                   decoration: BoxDecoration(
-                       shape: BoxShape.rectangle,
+                      shape: BoxShape.rectangle,
                       borderRadius: BorderRadius.circular(10),
                       color: Colors.black,
                       image: DecorationImage(
-
-                          image: NetworkImage(image!),
-
-                          fit: BoxFit.fill)),
+                          image: NetworkImage(image!), fit: BoxFit.fill)),
                 ),
               )),
               Expanded(
@@ -120,14 +118,16 @@ class CardView extends StatelessWidget {
                         SizedBox(width: 10),
                         Container(
                           child: TextButton(
-                           onPressed: () {
-                             share();
-                           }, child: Text("Share"),),
+                            onPressed: () {
+                              share();
+                            },
+                            child: Text("Share"),
+                          ),
                         ),
                         Container(
                           child: IconButton(
                             icon: const Icon(
-                              Icons.bookmark,
+                              Icons.book_outlined,
                             ),
                             iconSize: 20,
                             color: Colors.black,
@@ -140,12 +140,46 @@ class CardView extends StatelessWidget {
                               Fluttertoast.showToast(
                                   msg: "Added bookmark successfully!");
 
+
                               Bookmark bookmark =
                                   Bookmark(url: image.toString());
+                              if(bookmark.url==image.toString())
+                                {
+
+                                }
+                              else
+                                {
+
+                                }
                               bookmarkDao.addToBookmark(bookmark);
                               debugPrint("callBookmarkDB:- $bookmark");
                             },
                           ),
+                          // child: LikeButton(
+                          //   size: 30,
+                          //   circleColor: CircleColor(
+                          //       start: Color(0xff00ddff),
+                          //       end: Color(0xff0099cc)),
+                          //   bubblesColor: const BubblesColor(
+                          //     dotPrimaryColor: Color(0xff33b5e5),
+                          //     dotSecondaryColor: Color(0xff0099cc),
+                          //   ),
+                          //   likeBuilder: (bool isLiked) {
+                          //     if (isLiked == true) {
+                          //       isClick = true;
+                          //     }
+                          //     debugPrint("bookmarkClicked:- $isLiked");
+                          //
+                          //     return Icon(
+                          //       Icons.bookmark,
+                          //       color: isLiked
+                          //           ? Colors.deepPurpleAccent
+                          //           : Colors.grey,
+                          //       size: 22,
+                          //     );
+                          //   },
+                          //   onTap: onLikeButtonTapped,
+                          // ),
                         )
                       ],
                     )
