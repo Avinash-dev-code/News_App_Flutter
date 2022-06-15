@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:newsdemoapp/helper/NewsDao.dart';
 import 'package:newsdemoapp/views/homepage.dart';
+import 'package:newsdemoapp/views/login_page.dart';
 
 import 'helper/NewsDB.dart';
 import 'helper/ThemeClas.dart';
@@ -40,7 +41,7 @@ class MyApp extends StatelessWidget {
           /* dark theme settings */
         ),
         themeMode: ThemeMode.light,
-        home:HomePage()
+        home:SplashScreen()
     );
     }
 }
