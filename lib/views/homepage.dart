@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
+import 'package:newsdemoapp/views/login_page.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -28,7 +30,8 @@ import '../models/article.dart';
 
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
-import 'CardView.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage();
@@ -42,11 +45,12 @@ class _HomePageState extends State<HomePage> {
   late bool isHomeVisible;
   var newslist;
   List<CategorieModel> categories = <CategorieModel>[];
-  List<Article> news1 = [];
-  List<TodaysNews> news2 = [];
+  List<TodaysNews> apiList = [];
+  List<TodaysNews> dbList = [];
   List<Bookmark> bookmarkData = [];
   List<TodaysNews> bookmark = [];
   List<TodaysNews> finalBookmarkList = [];
+  List<TodaysNews> topHeadlineList = [];
   List<String> urls = [];
   News news = News();
   TopHeadlines topHeadlines = TopHeadlines();
@@ -59,18 +63,45 @@ class _HomePageState extends State<HomePage> {
   String latitude = "";
   String longitude = "";
   String userName = "";
+  String usersPhoto = "";
   String photo = "";
 
-  void getNews() async {
+  Future getNews() async {
     WidgetsFlutterBinding.ensureInitialized();
+    var now = DateTime.now();
+    String tempDate1 = DateFormat("yyyy-MM-dd").format(now);
+    debugPrint("getDate:- $tempDate1");
+    // News.newsList;
 
-    await news.getNews("2022-06-12", "2022-06-12");
-    newslist = news.news;
-    news1 = news.news;
-    news.news.toSet().toList();
+    bool result = await InternetConnectionChecker().hasConnection;
+    debugPrint("Result Internet:- ${result}");
+    if (result == true) {
+      await news.getNews(tempDate1, tempDate1);
+      debugPrint('YAY! Free cute dog pics!');
+      dbList = News.newsList;
+      debugPrint("apiList:- ${dbList.length}  ${News.newsList.length}");
+    } else {
+
+      final database = await $FloorNewsDB.databaseBuilder('NewsDB.db').build();
+
+      final personDao = database.newsDao;
+      Fluttertoast.showToast(msg: "please connect to the internet");
+      dbList = await personDao.findAllPersons();
+
+      debugPrint('No internet :( Reason:');
+
+      // Fluttertoast.showToast(msg: "please connect to the internet");
+      // dbList = await personDao.findAllPersons();
+      //
+      // debugPrint('No internet :( Reason:');
+      // debugPrint("databaseList:- ${dbList.length}");
+    }
+    // news.news.toSet().toList();
     setState(() {
       _loading = false;
     });
+
+    return apiList;
 
     // for(TodaysNews e in removeDuplicates(news2))
     //   {
@@ -98,8 +129,7 @@ class _HomePageState extends State<HomePage> {
 
   // Driver
   void getTopHeadlineNews() async {
-    await topHeadlines.getNews();
-    topHeadlines.news.toSet().toList();
+    topHeadlineList = await topHeadlines.getNews();
 
     setState(() {
       _loading = false;
@@ -107,15 +137,13 @@ class _HomePageState extends State<HomePage> {
     // var convertedTimestamp = DateTime.parse(
     //     news.news[0].publshedAt); // Converting into [DateTime] object
     // var result = GetTimeAgo.parse(convertedTimestamp);
-    debugPrint("topHeadlines:- ${topHeadlines.news.toString()}");
+    debugPrint("topHeadlines:- ${topHeadlineList.length}");
   }
 
   final RefreshController _refreshController =
       RefreshController(initialRefresh: false);
 
   void _onItemTapped(int index) {
-
-
     setState(() {
       selectedIndex = index;
       debugPrint("SelectedList:- $selectedIndex");
@@ -142,20 +170,29 @@ class _HomePageState extends State<HomePage> {
     finalBookmarkList = (await personDao.getBookmark(urls))!;
     debugPrint("completeBookData1 :- ${urls.toString()}");
     removeDuplicates(finalBookmarkList);
-
   }
 
   void callDB() async {
     final database = await $FloorNewsDB.databaseBuilder('NewsDB.db').build();
 
     final personDao = database.newsDao;
-
-    news2 = await personDao.findAllPersons();
-    debugPrint("bookmark222:- ${news2.length}");
-
-    // for (TodaysNews e in news2) {
-    //   urls.add(e.urlToImage);
+    //
+    // bool result = await InternetConnectionChecker().hasConnection;
+    // if (result == true) {
+    //   debugPrint('YAY! Free cute dog pics!');
+    //   dbList = News.newsList;
+    //   debugPrint("apiList:- ${dbList.length}  ${News.newsList.length}");
+    // } else {
+    //   Fluttertoast.showToast(msg: "please connect to the internet");
+    //   dbList = await personDao.findAllPersons();
+    //
+    //   debugPrint('No internet :( Reason:');
+    //   debugPrint("databaseList:- ${dbList.length}");
     // }
+
+    for (TodaysNews e in dbList) {
+      urls.add(e.urlToImage);
+    }
     bookmark = (await personDao.getBookmark(urls))!;
     // for (TodaysNews e in bookmark) {
     //   debugPrint("completeBookData :- ${e.urlToImage}");
@@ -181,6 +218,7 @@ class _HomePageState extends State<HomePage> {
     formattedDate = formatter.format(now);
     categories = getCategories();
     getName();
+    // _onRefresh();
     getNews();
     getTopHeadlineNews();
     callDB();
@@ -256,13 +294,12 @@ class _HomePageState extends State<HomePage> {
       // accessing the position and request users of the
       // App to enable the location services.
       Fluttertoast.showToast(
-          msg: "This is a Toast message",  // message
+          msg: "This is a Toast message", // message
           toastLength: Toast.LENGTH_SHORT, // length
-          gravity: ToastGravity.CENTER,    // location
-          timeInSecForIosWeb: 1               // duration
-      );
+          gravity: ToastGravity.CENTER, // location
+          timeInSecForIosWeb: 1 // duration
+          );
       Geolocator.openLocationSettings();
-
 
       return Future.error('Location services are disabled.');
     }
@@ -306,7 +343,8 @@ class _HomePageState extends State<HomePage> {
         await placemarkFromCoordinates(position.latitude, position.longitude);
     debugPrint("location :- $placemarks $latitude  $longitude");
     setState(() {
-      locationMessage = "${placemarks[0].subLocality},${placemarks[0].locality}";
+      locationMessage =
+          "${placemarks[0].subLocality},${placemarks[0].locality}";
     });
     return await Geolocator.getCurrentPosition();
   }
@@ -318,6 +356,7 @@ class _HomePageState extends State<HomePage> {
 
       setState(() {
         imageFile = File(image.path);
+        savedProfileImage(imageFile.path.toString());
       });
     }
   }
@@ -329,6 +368,7 @@ class _HomePageState extends State<HomePage> {
       // imageFile = File(image.path);
       setState(() {
         imageFile = File(image.path);
+        savedProfileImage(imageFile.path.toString());
       });
     }
   }
@@ -346,6 +386,7 @@ class _HomePageState extends State<HomePage> {
           child: Text("Camera"),
           onPressed: () {
             getFromCamera();
+            getImage();
             Navigator.of(context, rootNavigator: true).pop('dialog');
           },
         ),
@@ -354,6 +395,7 @@ class _HomePageState extends State<HomePage> {
           child: Text("Gallery"),
           onPressed: () {
             getFromGallery();
+            getImage();
             Navigator.of(context, rootNavigator: true).pop('dialog');
           },
         )
@@ -374,13 +416,35 @@ class _HomePageState extends State<HomePage> {
       },
     );
   }
-  Future<void> getName() async
-  {
+
+  Future<void> getName() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    userName=prefs.getString("name")!;
-    photo=prefs.getString("photo")!;
+    userName = prefs.getString("name")!;
+    photo = prefs.getString("photo")!;
+    prefs.setString("photo", photo);
+
     debugPrint("isPhoto:= $userName $photo");
   }
+
+  Future<void> getImage() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    usersPhoto = prefs.getString("photo")!;
+  }
+
+  Future<void> savedProfileImage(String profileImage) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString("photo", profileImage);
+  }
+
+  Future<void> signOutGoogle() async {
+    await FirebaseAuth.instance.signOut();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    prefs.setBool("isLogged", false);
+
+    print("User Signed Out");
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget? child = null;
@@ -406,7 +470,7 @@ class _HomePageState extends State<HomePage> {
                           fontStyle: FontStyle.normal,
                           fontWeight: FontWeight.normal),
                     ),
-                     Text(
+                    Text(
                       "Welcome \n$userName",
                       textAlign: TextAlign.start,
                       style: TextStyle(
@@ -443,23 +507,31 @@ class _HomePageState extends State<HomePage> {
             height: 200.0,
             child: ListView.builder(
                 scrollDirection: Axis.horizontal,
-                itemCount: topHeadlines.news.length,
+                itemCount: topHeadlineList.length,
                 shrinkWrap: true,
                 physics: ClampingScrollPhysics(),
                 itemBuilder: (context, index) {
-                  var convertedTimestamp = DateTime.parse(topHeadlines
-                      .news[index]
+                  var convertedTimestamp = DateTime.parse(topHeadlineList[index]
                       .publshedAt); // Converting into [DateTime] object
                   var result = GetTimeAgo.parse(convertedTimestamp);
-
+                  if (result == ("a day ago")) {
+                    result = "1 day ago";
+                  } else {
+                    result = GetTimeAgo.parse(convertedTimestamp);
+                  }
+                  if (result == ("an hour ago")) {
+                    result = "1 hour ago";
+                  } else {
+                    result = GetTimeAgo.parse(convertedTimestamp);
+                  }
                   return NewsTile2(
-                      imgUrl1: topHeadlines.news[index].urlToImage ?? "",
-                      title1: topHeadlines.news[index].title ?? "",
-                      desc1: topHeadlines.news[index].description ?? "",
-                      content1: topHeadlines.news[index].content ?? "",
-                      posturl1: topHeadlines.news[index].articleUrl ?? "",
+                      imgUrl1: topHeadlineList[index].urlToImage ?? "",
+                      title1: topHeadlineList[index].title ?? "",
+                      desc1: topHeadlineList[index].description ?? "",
+                      content1: topHeadlineList[index].content ?? "",
+                      posturl1: topHeadlineList[index].articleUrl ?? "",
                       publishAt1: result ?? "",
-                      author1: topHeadlines.news[index].author ?? "");
+                      author1: topHeadlineList[index].author ?? "");
                 }),
           ),
 
@@ -484,11 +556,11 @@ class _HomePageState extends State<HomePage> {
                 Container(
                   margin: EdgeInsets.symmetric(vertical: 20.0),
                   child: ListView.builder(
-                      itemCount: news2.length,
+                      itemCount: dbList.length,
                       shrinkWrap: true,
                       physics: ClampingScrollPhysics(),
                       itemBuilder: (context, index) {
-                        var convertedTimestamp = DateTime.parse(news2[index]
+                        var convertedTimestamp = DateTime.parse(dbList[index]
                             .publshedAt); // Converting into [DateTime] object
                         var result = GetTimeAgo.parse(convertedTimestamp);
                         if (result == ("a day ago")) {
@@ -496,8 +568,14 @@ class _HomePageState extends State<HomePage> {
                         } else {
                           result = GetTimeAgo.parse(convertedTimestamp);
                         }
+                        debugPrint("databaseListUI:- ${dbList.length}");
 
-                        final contact = removeDuplicates(news2)[index];
+                        if (result == ("an hour ago")) {
+                          result = "1 hour ago";
+                        } else {
+                          result = GetTimeAgo.parse(convertedTimestamp);
+                        }
+                        final contact = removeDuplicates(dbList)[index];
 // debugPrint("NewsDatabse:- ${retrieveUsers()}");
                         return NewsTile(
                             imgUrl: contact.urlToImage ?? "",
@@ -530,7 +608,11 @@ class _HomePageState extends State<HomePage> {
               } else {
                 result = GetTimeAgo.parse(convertedTimestamp);
               }
-
+              if (result == ("an hour ago")) {
+                result = "1 hour ago";
+              } else {
+                result = GetTimeAgo.parse(convertedTimestamp);
+              }
               final contact = removeDuplicates(finalBookmarkList)[index];
               debugPrint("NewsDatabseB:- ${finalBookmarkList.length}");
               return NewsTile(
@@ -547,76 +629,93 @@ class _HomePageState extends State<HomePage> {
       case 2:
         child = Container(
             height: 500,
-            child:
-            Column(children: <Widget>[
-              Stack(
-                children: <Widget>[
-                  Container(
-                    height: 200,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: Colors.black,
-                        image: DecorationImage(
-                            colorFilter: ColorFilter.mode(
-                                Colors.black.withOpacity(0.6), BlendMode.dstATop),
-                            image:  CachedNetworkImageProvider(
-                                imageFile.path),
-                            fit: BoxFit.fill)),
-                  ),
-
-                      Container(
-                          alignment: Alignment.center,
-                          margin: const EdgeInsets.only(top: 130),
-                          child: Column(
-                            children: <Widget>[
-                              GestureDetector(
-                                onTap: () {
-                                  //Do something
-                                  // getFromCamera();
-                                  showAlertDialog(context);
-                                },
-                                child: CircleAvatar(
+            child: Column(
+              children: <Widget>[
+                Stack(
+                  children: <Widget>[
+                    Container(
+                      height: 200,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: Colors.black,
+                          image: DecorationImage(
+                              colorFilter: ColorFilter.mode(
+                                  Colors.black.withOpacity(0.6),
+                                  BlendMode.dstATop),
+                              image: CachedNetworkImageProvider(imageFile.path),
+                              fit: BoxFit.fill)),
+                    ),
+                    Container(
+                        alignment: Alignment.center,
+                        margin: const EdgeInsets.only(top: 130),
+                        child: Column(
+                          children: <Widget>[
+                            GestureDetector(
+                              onTap: () {
+                                //Do something
+                                // getFromCamera();
+                                showAlertDialog(context);
+                                getImage();
+                              },
+                              child: CircleAvatar(
                                   radius: 60,
-                                  backgroundImage: CachedNetworkImageProvider(photo),
-                                ),
-                              ),
-                              SizedBox(height: 10),
-                              Text(
-                                userName,
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 20),
-                              ),
-
-                            ],
-                          )),
-
-                ],
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  _determinePosition();
-                },
-                child: const Text("Get Current Location"),
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-
-              Text(
-                locationMessage,
-                style: const TextStyle(
-                  fontSize: 20,
-                  color: Colors.blue,
+                                  backgroundImage: usersPhoto.isNotEmpty
+                                      ? Image.file(imageFile).image
+                                      : NetworkImage(photo)),
+                            ),
+                            SizedBox(height: 10),
+                            Text(
+                              userName,
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 20),
+                            ),
+                          ],
+                        )),
+                  ],
                 ),
-              ),
-            ],)
-
-           );
+                ElevatedButton(
+                  onPressed: () {
+                    _determinePosition();
+                  },
+                  child: const Text("Get Current Location"),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                Text(
+                  locationMessage,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    color: Colors.blue,
+                  ),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    signOutGoogle();
+                    Navigator.pushReplacement(
+                        context,
+                        PageTransition(
+                            type: PageTransitionType.leftToRight,
+                            child: LoginPage()));
+                  },
+                  child: const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text(
+                      'Sign Out',
+                      style: TextStyle(fontSize: 20, color: Colors.white),
+                    ),
+                  ),
+                )
+              ],
+            ));
 
         break;
     }
     return Scaffold(
-      appBar: MyAppBar(photo),
+      appBar: MyAppBar(usersPhoto),
       body: SafeArea(
           child: SmartRefresher(
               controller: _refreshController,
@@ -708,20 +807,20 @@ class CategoryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => CategoryNews(
-                      newsCategory: categoryName.toUpperCase(),
-                    )));
+        // Navigator.push(
+        //     context,
+        //     MaterialPageRoute(
+        //         builder: (context) => CategoryNews(
+        //               newsCategory: categoryName.toUpperCase(),
+        //             )));
 
         Navigator.push(
             context,
             PageTransition(
-                type: PageTransitionType.bottomToTopJoined,
-                child: CategoryNews(
-                  newsCategory: categoryName.toUpperCase(),
-                ),
+              type: PageTransitionType.leftToRightWithFade,
+              child: CategoryNews(
+                newsCategory: categoryName.toUpperCase(),
+              ),
             ));
       },
       child: Container(

@@ -14,8 +14,8 @@ import 'package:newsdemoapp/secret.dart';
 import 'NewsDB.dart';
 
 class News {
-  List<Article> news = [];
-  List<TodaysNews> newsList = [];
+  static List<TodaysNews> news = [];
+  static List<TodaysNews> newsList = [];
 
   Future<void> getNews(String startDate, String endDate) async {
     var now = DateTime.now();
@@ -27,7 +27,7 @@ class News {
     var newDate = DateTime(now.year, now.month, now.day - 5);
     news.clear();
     var url =
-        "https://newsapi.org/v2/everything?q=apple&from=$formattedDate1&to=${formattedDate2}&sortBy=popularity&apiKey=$apiKey";
+        "https://newsapi.org/v2/everything?q=tesla&from=$formattedDate1&to=${formattedDate2}&sortBy=popularity&apiKey=$apiKey";
     debugPrint('topHeald: ${url}');
 
     var response = await http.get(Uri.parse(url));
@@ -47,15 +47,15 @@ class News {
        debugPrint("newslist2:- ${newsList.length}");
       jsonData["articles"].forEach((element) async {
         if (element['urlToImage'] != null && element['description'] != null) {
-          Article article = Article(
-            title: element['title'],
-            author: element['author'],
-            description: element['description'],
-            urlToImage: element['urlToImage'],
-            publshedAt: element['publishedAt'],
-            content: element["content"],
-            articleUrl: element["url"],
-          );
+          // Article article = Article(
+          //   title: element['title'],
+          //   author: element['author'],
+          //   description: element['description'],
+          //   urlToImage: element['urlToImage'],
+          //   publshedAt: element['publishedAt'],
+          //   content: element["content"],
+          //   articleUrl: element["url"],
+          // );
           TodaysNews todaysNews = TodaysNews(
               title: element['title'],
               author: element['author'],
@@ -68,7 +68,7 @@ class News {
 
             debugPrint;
 
-          news.add(article);
+          news.add(todaysNews);
         }
       });
         if(newsList.isNotEmpty)
@@ -97,7 +97,7 @@ class NewsForCategorie {
     String formattedDate2 = formatter.format(tempDate2);
     /*String url = "http://newsapi.org/v2/everything?q=$category&apiKey=${apiKey}";*/
     var url =
-        "https://newsapi.org/v2/everything?q=apple&from=$formattedDate1&to=${formattedDate2}&sortBy=popularity&apiKey=$apiKey";
+        "https://newsapi.org/v2/everything?q=$category&from=$formattedDate1&to=${formattedDate2}&sortBy=popularity&apiKey=$apiKey";
 
     var response = await http.get(Uri.parse(url));
     news.clear();

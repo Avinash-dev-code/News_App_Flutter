@@ -80,8 +80,7 @@ class SplashScreenState extends State<SplashScreen> {
     return Container(
         color: Colors.yellow,
         child: FlutterLogo(size: MediaQuery
-            .of(context)
-            .size
+            .of(context).size
             .height)
 
     );

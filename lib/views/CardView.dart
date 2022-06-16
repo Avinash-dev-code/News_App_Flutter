@@ -141,7 +141,7 @@ class CardView extends StatelessWidget {
                               Fluttertoast.showToast(
                                   msg: "Added bookmark successfully!");
 
-
+                              
                               Bookmark bookmark =
                                   Bookmark(url: image.toString());
                               if(bookmark.url==image.toString())
@@ -153,7 +153,7 @@ class CardView extends StatelessWidget {
 
                                 }
                               bookmarkDao.addToBookmark(bookmark);
-                              debugPrint("callBookmarkDB:- $bookmark");
+                              debugPrint("callBookmarkDB:- ${bookmark.url}");
                             },
                           ),
                           // child: LikeButton(

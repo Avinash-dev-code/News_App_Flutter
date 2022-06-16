@@ -57,6 +57,7 @@ dependencies:
   flutter_local_notifications: ^9.6.0
   intl: ^0.17.0
   floor: ^1.2.0
+  internet_connection_checker: ^0.0.1+4
 dev_dependencies:
   flutter_test:
     sdk: flutter

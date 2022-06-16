@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'dart:io';
 import 'package:newsdemoapp/views/Profile.dart';
 import 'package:newsdemoapp/views/article_view.dart';
 import 'package:page_transition/page_transition.dart';
@@ -7,6 +8,7 @@ import '../views/CardView.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 PreferredSizeWidget MyAppBar(String image) {
+  debugPrint("avatar:- $image");
 
   return AppBar(
     iconTheme: const IconThemeData(color: Colors.black),
@@ -33,11 +35,10 @@ PreferredSizeWidget MyAppBar(String image) {
         alignment: Alignment.topRight,
         child: GestureDetector(
             onTap: () {
-              debugPrint("avatar:- $image");
             },
             child: CircleAvatar(
               radius: 30.0,
-              backgroundImage: CachedNetworkImageProvider(image),
+              backgroundImage: image.contains("/data/")? Image.file(File(image)).image:NetworkImage(image),
               backgroundColor: Colors.transparent,
             )),
       ),
@@ -69,12 +70,6 @@ class NewsTile extends StatelessWidget {
                   type: PageTransitionType.bottomToTop,
                   child: ArticleView(postUrl: posturl)));
 
-          // Navigator.push(
-          //     context,
-          //     MaterialPageRoute(
-          //         builder: (context) => ArticleView(
-          //               postUrl: posturl,
-          //             )));
         },
         child: Container(
             child: Padding(

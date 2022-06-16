@@ -32,7 +32,7 @@ class _LoginPageState extends State<LoginPage> {
           child: Container(
           child: Image(
             image:
-            CachedNetworkImageProvider("https://img.freepik.com/free-vector/mobile-login-concept-illustration_114360-83.jpg?t=st=1655315056~exp=1655315656~hmac=0d399d61f851eabb7de558776502f31493b625cc77e17a3c05af64c1faf2e432&w=740"),
+            NetworkImage("https://img.freepik.com/free-vector/mobile-login-concept-illustration_114360-83.jpg?t=st=1655315056~exp=1655315656~hmac=0d399d61f851eabb7de558776502f31493b625cc77e17a3c05af64c1faf2e432&w=740"),
           ),
         ),
       ),
@@ -73,7 +73,7 @@ class _LoginPageState extends State<LoginPage> {
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: const <Widget>[
-            Image(image:CachedNetworkImageProvider("https://www.freepnglogos.com/uploads/google-logo-png/google-logo-png-webinar-optimizing-for-success-google-business-webinar-13.png"), height: 35.0),
+            Image(image:NetworkImage("https://www.freepnglogos.com/uploads/google-logo-png/google-logo-png-webinar-optimizing-for-success-google-business-webinar-13.png"), height: 35.0),
             Padding(
               padding: EdgeInsets.only(left: 10),
               child: Text(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:newsdemoapp/models/TodaysNews.dart';
 import 'package:newsdemoapp/models/article.dart';
 import 'dart:convert';
 import 'dart:core';
@@ -9,9 +10,9 @@ import 'package:intl/intl.dart';
 import 'package:newsdemoapp/secret.dart';
 
 class TopHeadlines {
-  List<Article> news = [];
+  List<TodaysNews> news = [];
 
-  Future<void> getNews() async {
+  Future<List<TodaysNews>> getNews() async {
     var now =  DateTime.now();
     var formatter =  DateFormat('yyyy-MM-dd');
     String formattedDate = formatter.format(now);
@@ -25,9 +26,10 @@ class TopHeadlines {
 
     var jsonData = jsonDecode(response.body);
     if (jsonData['status'] == "ok") {
+      news.clear();
       jsonData["articles"].forEach((element) {
         if (element['urlToImage'] != null && element['description'] != null) {
-          Article article = Article(
+          TodaysNews article = TodaysNews(
             title: element['title'],
             author: element['author'],
             description: element['description'],
@@ -40,6 +42,7 @@ class TopHeadlines {
         }
       });
     }
+    return news;
   }
 }
 
