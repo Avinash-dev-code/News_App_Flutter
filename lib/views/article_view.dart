@@ -3,11 +3,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:flutter_share/flutter_share.dart';
-
+import 'package:percent_indicator/percent_indicator.dart';
 class ArticleView extends StatefulWidget {
   final String postUrl;
 
-  const ArticleView({required this.postUrl});
+   ArticleView({required this.postUrl});
 
   @override
   _ArticleViewState createState() => _ArticleViewState();
@@ -16,6 +16,9 @@ class ArticleView extends StatefulWidget {
 class _ArticleViewState extends State<ArticleView> {
   final Completer<WebViewController> _controller =
   Completer<WebViewController>();
+  bool isLoading=true;
+  final key1 = UniqueKey();
+  double webProgress=0;
 
 
   Future<void> share() async {
@@ -37,13 +40,13 @@ class _ArticleViewState extends State<ArticleView> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: const <Widget>[
             Text(
-              "Flutter",
+              "News",
               style:
               TextStyle(color: Colors.black87, fontWeight: FontWeight.w600),
               maxLines: 1,
             ),
             Text(
-              " News ",
+              " Now ",
               style: TextStyle(color: Colors.blue, fontWeight: FontWeight.w600),
             ),
 
@@ -73,12 +76,57 @@ class _ArticleViewState extends State<ArticleView> {
             .of(context)
             .size
             .width,
-        child: WebView(
-          initialUrl: widget.postUrl,
-          onWebViewCreated: (WebViewController webViewController) {
-            _controller.complete(webViewController);
-          },
-        ),
+        child:Column(
+          children: [
+             webProgress<1?SizedBox(height:5,
+        child: LinearProgressIndicator(
+          value: webProgress,
+          color: Colors.blue,
+          backgroundColor: Colors.black,
+        )):SizedBox(),
+
+        Expanded(
+            child: WebView(
+              key: key1,
+              initialUrl: widget.postUrl,
+              javascriptMode: JavascriptMode.unrestricted,
+              gestureNavigationEnabled: true,
+
+
+              backgroundColor: const Color(0x00000000),
+              onProgress: (progress) =>setState((){
+               this.webProgress=progress/100;
+
+
+              }),
+              // {
+              //   debugPrint('WebView is loading (progress : $progress%)');
+              //   CircularPercentIndicator(
+              //     radius: 120.0,
+              //     lineWidth: 10.0,
+              //     animation: true,
+              //     percent: progress/100,
+              //     center: Text(
+              //       progress.toString() + "%",
+              //       style: TextStyle(
+              //           fontSize: 20.0,
+              //           fontWeight: FontWeight.w600,
+              //           color: Colors.black),
+              //     ),
+              //     backgroundColor: Colors.black,
+              //     circularStrokeCap: CircularStrokeCap.round,
+              //     progressColor: Colors.redAccent,
+              //   );
+              // },
+
+              onWebViewCreated: (WebViewController webViewController) {
+                _controller.complete(webViewController);
+              },
+            ))
+          ],
+        )
+
+
       ),
     );
   }

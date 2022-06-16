@@ -106,12 +106,15 @@ class NewsTile2 extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
         onTap: () {
+
           Navigator.push(
               context,
-              MaterialPageRoute(
-                  builder: (context) => ArticleView(
-                        postUrl: posturl1,
-                      )));
+              PageTransition(
+                type: PageTransitionType.rightToLeftWithFade,
+                child:  ArticleView(
+                  postUrl: posturl1,
+                ),
+              ));
         },
         child: Container(
           width: 300,

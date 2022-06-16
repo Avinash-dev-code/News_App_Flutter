@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:newsdemoapp/views/sign_in.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -714,6 +714,15 @@ class CategoryCard extends StatelessWidget {
                 builder: (context) => CategoryNews(
                       newsCategory: categoryName.toUpperCase(),
                     )));
+
+        Navigator.push(
+            context,
+            PageTransition(
+                type: PageTransitionType.bottomToTopJoined,
+                child: CategoryNews(
+                  newsCategory: categoryName.toUpperCase(),
+                ),
+            ));
       },
       child: Container(
         alignment: Alignment.topRight,

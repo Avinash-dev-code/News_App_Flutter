@@ -71,7 +71,7 @@ class SplashScreenState extends State<SplashScreen> {
   Future<bool?> getLogged() async
   {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    islogged=prefs.getBool("isL1ogged")!;
+    islogged=prefs.getBool("isLogged")!;
     debugPrint("isLogged:= $islogged");
   }
 
