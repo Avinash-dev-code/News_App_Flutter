@@ -360,6 +360,8 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         imageFile = File(image.path);
         savedProfileImage(imageFile.path.toString());
+        getImage();
+
       });
 
     }
@@ -373,6 +375,8 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         imageFile = File(image.path);
         savedProfileImage(imageFile.path.toString());
+        getImage();
+
       });
     }
   }
@@ -418,6 +422,7 @@ class _HomePageState extends State<HomePage> {
   Future<void> savedProfileImage(String profileImage) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString("photo", profileImage);
+    debugPrint("cameeraImage:  $profileImage");
   }
 
   Future<void> signOutGoogle() async {
@@ -433,8 +438,6 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     Widget? child = null;
     var currentDate = DateFormat('EEEE,MMMM d').format(DateTime.now());
-    debugPrint("photos:=-=  $usersPhoto  $imageFile");
-    Fluttertoast.showToast(msg: "sharePreferencePhoto:- $usersPhoto== $imageFile");
     switch (selectedIndex) {
       case 0:
         child = Container(
@@ -490,6 +493,9 @@ class _HomePageState extends State<HomePage> {
               ),
 
           ///Top Headlines
+            Visibility(
+                visible: topHeadlineList.length==0?false:true,
+                child: Column(children: [
               Container(
                 alignment: Alignment.topLeft,
                 margin: EdgeInsets.only(left: 20),
@@ -504,38 +510,40 @@ class _HomePageState extends State<HomePage> {
                       fontWeight: FontWeight.bold),
                 ),
               ),
-          Container(
-            margin: const EdgeInsets.symmetric(vertical: 20.0),
-            height: 200.0,
-            child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: topHeadlineList.length,
-                shrinkWrap: true,
-                physics: ClampingScrollPhysics(),
-                itemBuilder: (context, index) {
-                  var convertedTimestamp = DateTime.parse(topHeadlineList[index]
-                      .publshedAt); // Converting into [DateTime] object
-                  var result = GetTimeAgo.parse(convertedTimestamp);
-                  if (result == ("a day ago")) {
-                    result = "1 day ago";
-                  } else {
-                    result = GetTimeAgo.parse(convertedTimestamp);
-                  }
-                  if (result == ("an hour ago")) {
-                    result = "1 hour ago";
-                  } else {
-                    result = GetTimeAgo.parse(convertedTimestamp);
-                  }
-                  return NewsTile2(
-                      imgUrl1: topHeadlineList[index].urlToImage ?? "",
-                      title1: topHeadlineList[index].title ?? "",
-                      desc1: topHeadlineList[index].description ?? "",
-                      content1: topHeadlineList[index].content ?? "",
-                      posturl1: topHeadlineList[index].articleUrl ?? "",
-                      publishAt1: result ?? "",
-                      author1: topHeadlineList[index].author ?? "");
-                }),
-          ),
+              Container(
+                margin: const EdgeInsets.symmetric(vertical: 20.0),
+                height: 200.0,
+                child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: topHeadlineList.length,
+                    shrinkWrap: true,
+                    physics: ClampingScrollPhysics(),
+                    itemBuilder: (context, index) {
+                      var convertedTimestamp = DateTime.parse(topHeadlineList[index]
+                          .publshedAt); // Converting into [DateTime] object
+                      var result = GetTimeAgo.parse(convertedTimestamp);
+                      if (result == ("a day ago")) {
+                        result = "1 day ago";
+                      } else {
+                        result = GetTimeAgo.parse(convertedTimestamp);
+                      }
+                      if (result == ("an hour ago")) {
+                        result = "1 hour ago";
+                      } else {
+                        result = GetTimeAgo.parse(convertedTimestamp);
+                      }
+                      return NewsTile2(
+                          imgUrl1: topHeadlineList[index].urlToImage ?? "",
+                          title1: topHeadlineList[index].title ?? "",
+                          desc1: topHeadlineList[index].description ?? "",
+                          content1: topHeadlineList[index].content ?? "",
+                          posturl1: topHeadlineList[index].articleUrl ?? "",
+                          publishAt1: result ?? "",
+                          author1: topHeadlineList[index].author ?? "");
+                    }),
+              )
+
+            ],)),
 
           ///News For you
           Column(
@@ -638,14 +646,13 @@ class _HomePageState extends State<HomePage> {
                     Container(
                       height: 200,
                       decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
                           color: Colors.black,
                           image: DecorationImage(
                               colorFilter: ColorFilter.mode(
-                                  Colors.black.withOpacity(0.6),
+                                  Colors.black.withOpacity(0.7),
                                   BlendMode.dstATop),
-                              image: CachedNetworkImageProvider(""),
-                              fit: BoxFit.fill)),
+                              image: CachedNetworkImageProvider("https://img.freepik.com/free-vector/flat-geometric-background_23-2149329827.jpg?t=st=1655459147~exp=1655459747~hmac=5c8e9adb11f8f20c68cb5f1b14828c3ae7fbca7706211895af0bffc87fbdcb9b&w=996"),
+                              fit: BoxFit.cover)),
                     ),
                     Container(
                         alignment: Alignment.center,
@@ -660,11 +667,7 @@ class _HomePageState extends State<HomePage> {
                               },
                               child: CircleAvatar(
                                   radius: 60,
-                                  backgroundImage:
-                                  imageFile.path.isEmpty?Image.file(File(usersPhoto)).image:usersPhoto!=imageFile?
-                                  Image.file(imageFile).image:usersPhoto.contains("/data/")
-                                      ? Image.file(File(usersPhoto)).image
-                                      : NetworkImage(usersPhoto)),
+                                  backgroundImage:usersPhoto.contains("https")?CachedNetworkImageProvider(usersPhoto):Image.file(File(usersPhoto)).image),
                             ),
                             SizedBox(height: 10),
                             Text(

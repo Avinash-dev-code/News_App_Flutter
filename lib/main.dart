@@ -5,6 +5,7 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:newsdemoapp/helper/NewsDao.dart';
+import 'package:newsdemoapp/views/ReorderedListView.dart';
 import 'package:newsdemoapp/views/homepage.dart';
 import 'package:newsdemoapp/views/notificationDemo.dart';
 import 'package:newsdemoapp/views/login_page.dart';
@@ -63,7 +64,7 @@ class SplashScreenState extends State<SplashScreen> {
             () =>
             Navigator.pushReplacement(context,
                 MaterialPageRoute(builder:
-                    (context) => islogged?HomePage():LoginPage()
+                    (context) => islogged?ReorderedListView():LoginPage()
                 )
             )
     );

@@ -110,7 +110,7 @@ class NewsTile2 extends StatelessWidget {
                       colorFilter: ColorFilter.mode(
                           Colors.black.withOpacity(0.6), BlendMode.dstATop),
                       image: CachedNetworkImageProvider(imgUrl1),
-                      fit: BoxFit.fill)),
+                      fit: BoxFit.cover)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.max,
@@ -188,7 +188,7 @@ class BookmarkTile extends StatelessWidget {
                       colorFilter: ColorFilter.mode(
                           Colors.black.withOpacity(0.6), BlendMode.dstATop),
                       image: CachedNetworkImageProvider(imgUrl1),
-                      fit: BoxFit.fill)),
+                      fit: BoxFit.cover)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.max,
