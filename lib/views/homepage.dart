@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -20,8 +21,7 @@ import 'package:newsdemoapp/models/categorie_model.dart';
 import 'package:newsdemoapp/views/categorie_news.dart';
 import 'package:path_provider/path_provider.dart';
 import '../helper/NewsDB.dart';
-import '../helper/NewsDao.dart';
-import '../helper/NewsDao.dart';
+
 import '../helper/news.dart';
 import 'package:get_time_ago/get_time_ago.dart';
 
@@ -222,6 +222,8 @@ class _HomePageState extends State<HomePage> {
     getNews();
     getTopHeadlineNews();
     callDB();
+    getImage();
+
     callBookmark();
   }
 
@@ -290,16 +292,18 @@ class _HomePageState extends State<HomePage> {
 
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      // Location services are not enabled don't continue
-      // accessing the position and request users of the
-      // App to enable the location services.
-      Fluttertoast.showToast(
-          msg: "This is a Toast message", // message
-          toastLength: Toast.LENGTH_SHORT, // length
-          gravity: ToastGravity.CENTER, // location
-          timeInSecForIosWeb: 1 // duration
-          );
-      Geolocator.openLocationSettings();
+      AwesomeDialog(
+        context: context,
+        dialogType: DialogType.NO_HEADER,
+        animType: AnimType.BOTTOMSLIDE,
+        title: 'Location Permission',
+        desc: 'allow news app to access your location',
+        btnCancelOnPress: () {},
+        btnOkOnPress: () {
+          Geolocator.openLocationSettings();
+
+        },
+      ).show();
 
       return Future.error('Location services are disabled.');
     }
@@ -353,11 +357,11 @@ class _HomePageState extends State<HomePage> {
     var image = await ImagePicker().pickImage(source: ImageSource.camera);
     if (image != null) {
       debugPrint("Camera Image:-  $image");
-
       setState(() {
         imageFile = File(image.path);
         savedProfileImage(imageFile.path.toString());
       });
+
     }
   }
 
@@ -376,52 +380,31 @@ class _HomePageState extends State<HomePage> {
   showAlertDialog(BuildContext context) {
     // Navigator.of(context, rootNavigator: true).pop('dialog');
     // set up the button
-    Widget remindButton, launchButton;
-    Widget ui = Row(
-      mainAxisSize: MainAxisSize.max,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: <Widget>[
-        SizedBox(width: 10),
-        remindButton = TextButton(
-          child: Text("Camera"),
-          onPressed: () {
-            getFromCamera();
-            getImage();
-            Navigator.of(context, rootNavigator: true).pop('dialog');
-          },
-        ),
-        SizedBox(width: 110),
-        launchButton = TextButton(
-          child: Text("Gallery"),
-          onPressed: () {
-            getFromGallery();
-            getImage();
-            Navigator.of(context, rootNavigator: true).pop('dialog');
-          },
-        )
-      ],
-    );
 
-    // set up the AlertDialog
-    AlertDialog alert = AlertDialog(
-      title: Center(child: Text("Image Picker")),
-      actions: [ui],
-    );
-
-    // show the dialog
-    showDialog(
+    AwesomeDialog(
       context: context,
-      builder: (BuildContext context) {
-        return alert;
+      dialogType: DialogType.NO_HEADER,
+      animType: AnimType.BOTTOMSLIDE,
+      title: 'Permission',
+      desc: 'allow news app to access your camera and storage',
+      btnCancelOnPress: () {
+        getFromCamera();
       },
-    );
+      btnCancelText: "Camera",
+      btnOkText: "Gallery",
+      btnOkOnPress: () {
+        getFromGallery();
+      },
+    ).show();
+
+
+
   }
 
   Future<void> getName() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     userName = prefs.getString("name")!;
     photo = prefs.getString("photo")!;
-    prefs.setString("photo", photo);
 
     debugPrint("isPhoto:= $userName $photo");
   }
@@ -429,6 +412,7 @@ class _HomePageState extends State<HomePage> {
   Future<void> getImage() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     usersPhoto = prefs.getString("photo")!;
+    debugPrint("Profile Image:- ${usersPhoto}");
   }
 
   Future<void> savedProfileImage(String profileImage) async {
@@ -449,6 +433,8 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     Widget? child = null;
     var currentDate = DateFormat('EEEE,MMMM d').format(DateTime.now());
+    debugPrint("photos:=-=  $usersPhoto  $imageFile");
+    Fluttertoast.showToast(msg: "sharePreferencePhoto:- $usersPhoto== $imageFile");
     switch (selectedIndex) {
       case 0:
         child = Container(
@@ -499,9 +485,25 @@ class _HomePageState extends State<HomePage> {
                   );
                 }),
           ),
+              const SizedBox(
+                height: 5,
+              ),
 
           ///Top Headlines
-          ///
+              Container(
+                alignment: Alignment.topLeft,
+                margin: EdgeInsets.only(left: 20),
+                child: const Text(
+                  "Top Headlines",
+                  maxLines: 1,
+                  textAlign: TextAlign.start,
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 18,
+                      fontStyle: FontStyle.normal,
+                      fontWeight: FontWeight.bold),
+                ),
+              ),
           Container(
             margin: const EdgeInsets.symmetric(vertical: 20.0),
             height: 200.0,
@@ -642,7 +644,7 @@ class _HomePageState extends State<HomePage> {
                               colorFilter: ColorFilter.mode(
                                   Colors.black.withOpacity(0.6),
                                   BlendMode.dstATop),
-                              image: CachedNetworkImageProvider(imageFile.path),
+                              image: CachedNetworkImageProvider(""),
                               fit: BoxFit.fill)),
                     ),
                     Container(
@@ -655,13 +657,14 @@ class _HomePageState extends State<HomePage> {
                                 //Do something
                                 // getFromCamera();
                                 showAlertDialog(context);
-                                getImage();
                               },
                               child: CircleAvatar(
                                   radius: 60,
-                                  backgroundImage: usersPhoto.isNotEmpty
-                                      ? Image.file(imageFile).image
-                                      : NetworkImage(photo)),
+                                  backgroundImage:
+                                  imageFile.path.isEmpty?Image.file(File(usersPhoto)).image:usersPhoto!=imageFile?
+                                  Image.file(imageFile).image:usersPhoto.contains("/data/")
+                                      ? Image.file(File(usersPhoto)).image
+                                      : NetworkImage(usersPhoto)),
                             ),
                             SizedBox(height: 10),
                             Text(
@@ -715,7 +718,7 @@ class _HomePageState extends State<HomePage> {
         break;
     }
     return Scaffold(
-      appBar: MyAppBar(usersPhoto),
+      appBar: MyAppBar(),
       body: SafeArea(
           child: SmartRefresher(
               controller: _refreshController,

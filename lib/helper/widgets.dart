@@ -7,8 +7,7 @@ import 'package:page_transition/page_transition.dart';
 import '../views/CardView.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-PreferredSizeWidget MyAppBar(String image) {
-  debugPrint("avatar:- $image");
+PreferredSizeWidget MyAppBar() {
 
   return AppBar(
     iconTheme: const IconThemeData(color: Colors.black),
@@ -30,18 +29,6 @@ PreferredSizeWidget MyAppBar(String image) {
             style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600),
           )),
       SizedBox(width: 60),
-      Container(
-        width: 40,
-        alignment: Alignment.topRight,
-        child: GestureDetector(
-            onTap: () {
-            },
-            child: CircleAvatar(
-              radius: 30.0,
-              backgroundImage: image.contains("/data/")? Image.file(File(image)).image:NetworkImage(image),
-              backgroundColor: Colors.transparent,
-            )),
-      ),
     ]),
     backgroundColor: Colors.transparent,
     elevation: 0.0,

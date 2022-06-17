@@ -56,6 +56,7 @@ dependencies:
   path_provider: ^2.0.11
   flutter_local_notifications: ^9.6.0
   intl: ^0.17.0
+  awesome_dialog: ^2.2.1
   floor: ^1.2.0
   internet_connection_checker: ^0.0.1+4
 dev_dependencies:
@@ -80,7 +81,7 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 assets:
-  - assets/
+  - assets/images/spider.png
 flutter:
 
   # The following line ensures that the Material Icons font is

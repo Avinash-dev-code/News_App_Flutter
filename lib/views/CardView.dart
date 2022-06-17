@@ -79,7 +79,7 @@ class CardView extends StatelessWidget {
                       borderRadius: BorderRadius.circular(10),
                       color: Colors.black,
                       image: DecorationImage(
-                          image: CachedNetworkImageProvider(image!), fit: BoxFit.fill)),
+                          image: CachedNetworkImageProvider(image!), fit: BoxFit.cover)),
                 ),
               )),
               Expanded(
