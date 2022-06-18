@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:flutter_share/flutter_share.dart';
-import 'package:percent_indicator/percent_indicator.dart';
+import 'dart:io';
 class ArticleView extends StatefulWidget {
   final String postUrl;
 
@@ -17,7 +17,6 @@ class _ArticleViewState extends State<ArticleView> {
   final Completer<WebViewController> _controller =
   Completer<WebViewController>();
   bool isLoading=true;
-  final key1 = UniqueKey();
   double webProgress=0;
 
 
@@ -27,6 +26,14 @@ class _ArticleViewState extends State<ArticleView> {
         linkUrl: widget.postUrl,
         chooserTitle: 'Example Chooser Title'
     );
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    if (Platform.isAndroid) WebView.platform = AndroidWebView();
+
   }
 
   @override
@@ -87,37 +94,15 @@ class _ArticleViewState extends State<ArticleView> {
 
         Expanded(
             child: WebView(
-              key: key1,
+
               initialUrl: widget.postUrl,
-              javascriptMode: JavascriptMode.unrestricted,
+              javascriptMode: JavascriptMode.disabled,
               gestureNavigationEnabled: true,
-
-
               backgroundColor: const Color(0x00000000),
+              
               onProgress: (progress) =>setState((){
                this.webProgress=progress/100;
-
-
               }),
-              // {
-              //   debugPrint('WebView is loading (progress : $progress%)');
-              //   CircularPercentIndicator(
-              //     radius: 120.0,
-              //     lineWidth: 10.0,
-              //     animation: true,
-              //     percent: progress/100,
-              //     center: Text(
-              //       progress.toString() + "%",
-              //       style: TextStyle(
-              //           fontSize: 20.0,
-              //           fontWeight: FontWeight.w600,
-              //           color: Colors.black),
-              //     ),
-              //     backgroundColor: Colors.black,
-              //     circularStrokeCap: CircularStrokeCap.round,
-              //     progressColor: Colors.redAccent,
-              //   );
-              // },
 
               onWebViewCreated: (WebViewController webViewController) {
                 _controller.complete(webViewController);
