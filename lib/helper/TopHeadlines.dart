@@ -31,7 +31,7 @@ class TopHeadlines {
         if (element['urlToImage'] != null && element['description'] != null) {
           TodaysNews article = TodaysNews(
             title: element['title'],
-            author: element['author'],
+            author: element['author']!,
             description: element['description'],
             urlToImage: element['urlToImage'],
             publshedAt: element['publishedAt'],

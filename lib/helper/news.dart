@@ -58,7 +58,7 @@ class News {
           // );
           TodaysNews todaysNews = TodaysNews(
               title: element['title'],
-              author: element['author'],
+              author: element['author']!,
               description: element['description'],
               urlToImage: element['urlToImage'],
               publshedAt: element['publishedAt'],

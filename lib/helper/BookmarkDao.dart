@@ -15,6 +15,6 @@ abstract class BookmarkDao {
 
 
 
-  @Insert()
+  @Insert(onConflict: OnConflictStrategy.replace)
   Future<void> addToBookmark(Bookmark bookmark);
 }

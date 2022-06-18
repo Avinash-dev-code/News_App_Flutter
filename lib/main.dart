@@ -94,12 +94,12 @@ class SplashScreenState extends State<SplashScreen> {
     // categorieModel3.categorieName = "General";
     // categorieModel3.imageAssetUrl = "https://images.unsplash.com/photo-1495020689067-958852a7765e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60";
     // category.add(categorieModel3);
-
-    Timer(const Duration(seconds: 3),
+    // ReorderedListView(list: array1)
+    Timer(const Duration(seconds: 2),
             () =>
             Navigator.pushReplacement(context,
                 MaterialPageRoute(builder:
-                    (context) => islogged?ReorderedListView(list: array1):LoginPage()
+                    (context) => islogged?HomePage():LoginPage()
                 )
             )
     );

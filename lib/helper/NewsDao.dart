@@ -27,6 +27,6 @@ abstract class NewsDao {
   Future<void> update(String title, String author, String description,
       String urlToImage, String publshedAt, String content, String articleUrl);
 
-  @Insert()
+  @Insert(onConflict: OnConflictStrategy.replace)
   Future<void> insertPerson(List<TodaysNews> list);
 }
