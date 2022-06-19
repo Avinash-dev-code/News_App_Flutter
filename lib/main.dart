@@ -8,6 +8,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:newsdemoapp/helper/NewsDao.dart';
 import 'package:newsdemoapp/models/categorie_model.dart';
 import 'package:newsdemoapp/views/ReorderedListView.dart';
+import 'package:newsdemoapp/views/SwitchTest.dart';
 import 'package:newsdemoapp/views/homepage.dart';
 import 'package:newsdemoapp/views/notificationDemo.dart';
 import 'package:newsdemoapp/views/login_page.dart';
@@ -63,15 +64,15 @@ class SplashScreenState extends State<SplashScreen> {
     super.initState();
     getLogged();
     List<CategorieModel> category=[];
-    final array1=[{"categorieName": "Business","isDisable":"false","imageAssetUrl":"https://images.unsplash.com/photo-1507679799987-c73779587ccf?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1502&q=80"},{"categorieName": "Science","isDisable":"false","imageAssetUrl":"https://images.unsplash.com/photo-1507679799987-c73779587ccf?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1502&q=80"},];
-    for (int i = 0; i < array1.length; i++) {
-      CategorieModel categorieModel = new CategorieModel();
-      categorieModel.categorieName =array1[i]["categorieName"].toString();
-      categorieModel.isDisable=array1[i]["isDisable"].toString();
-      categorieModel.imageAssetUrl = array1[i]["imageAssetUrl"].toString();
-      category.add(categorieModel);
-
-    }
+    final array1=[{"categorieName": "Business","isDisable":"false","imageAssetUrl":"https://images.unsplash.com/photo-1507679799987-c73779587ccf?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1502&q=80"},{"categorieName": "Science","isDisable":"false","imageAssetUrl":"https://images.unsplash.com/photo-1507679799987-c73779587ccf?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1502&q=80"},{"categorieName": "Health","isDisable":"false","imageAssetUrl":"https://images.unsplash.com/photo-1507679799987-c73779587ccf?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1502&q=80"}];
+    // for (int i = 0; i < array1.length; i++) {
+    //   CategorieModel categorieModel = new CategorieModel();
+    //   categorieModel.categorieName =array1[i]["categorieName"].toString();
+    //   categorieModel.isDisable=array1[i]["isDisable"].toString();
+    //   categorieModel.imageAssetUrl = array1[i]["imageAssetUrl"].toString();
+    //   category.add(categorieModel);
+    //
+    // }
     // debugPrint("findList:- ${array1[0]["categorieName"]}");
     // CategorieModel categorieModel = new CategorieModel();
     // categorieModel.categorieName = "Business";
@@ -99,7 +100,7 @@ class SplashScreenState extends State<SplashScreen> {
             () =>
             Navigator.pushReplacement(context,
                 MaterialPageRoute(builder:
-                    (context) => islogged?HomePage():LoginPage()
+                    (context) => islogged?notificationDemo():LoginPage()
                 )
             )
     );

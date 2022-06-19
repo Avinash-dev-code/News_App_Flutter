@@ -3,6 +3,8 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:newsdemoapp/views/article_view.dart';
+import 'package:newsdemoapp/views/homepage.dart';
 
 class notificationDemo extends StatefulWidget {
   @override
@@ -10,7 +12,7 @@ class notificationDemo extends StatefulWidget {
 }
 
 class notificationDemo1 extends State<notificationDemo> {
-
+   String check="";
   @override
   void initState() {
     // TODO: implement initState
@@ -45,25 +47,22 @@ class notificationDemo1 extends State<notificationDemo> {
       ticker: 'ticker',
 
     );
+    check=androidDetail.ticker!;
+
     var iosDetail = IOSNotificationDetails();
-    final allDetail =
-    NotificationDetails(android: androidDetail, iOS: iosDetail);
+    final allDetail = NotificationDetails(android: androidDetail, iOS: iosDetail);
     await fP.show(0, "title", "body", allDetail,
         payload: "first notifications");
   }
 
   void onSelectNotification(String? payload) async{
-    showDialog(
-        context: context,
-        builder: (_) => AlertDialog(
-          title: const Text(
-              "Hello Everyone"
-          ),
-          content: Text(
-              "$payload"
-          ),
-        )
-    );
+    if(payload=="first notifications")
+    {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) =>  ArticleView(postUrl: "https://www.businessinsider.co.za/tesla-will-lose-crown-biggest-electric-car-maker-2024-study-2022-6")),
+      );
+    }
   }
   @override
   Widget build(BuildContext context) {
@@ -74,13 +73,14 @@ class notificationDemo1 extends State<notificationDemo> {
           children: [
             MaterialButton(
               onPressed: () {
+
                 displayingNotification();
               },
               color: Colors.blue,
               textColor: Colors.white,
-              child: Text("Notification"),
+              child: const Text("Notification"),
             ),
-            Image(image: AssetImage(AppImages.lion))
+            const Image(image: AssetImage(AppImages.lion))
           ],
         ),
       ),
