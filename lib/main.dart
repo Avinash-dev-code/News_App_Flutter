@@ -8,7 +8,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:newsdemoapp/helper/NewsDao.dart';
 import 'package:newsdemoapp/models/categorie_model.dart';
 import 'package:newsdemoapp/views/ReorderedListView.dart';
-import 'package:newsdemoapp/views/SwitchTest.dart';
 import 'package:newsdemoapp/views/homepage.dart';
 import 'package:newsdemoapp/views/notificationDemo.dart';
 import 'package:newsdemoapp/views/login_page.dart';
@@ -100,7 +99,7 @@ class SplashScreenState extends State<SplashScreen> {
             () =>
             Navigator.pushReplacement(context,
                 MaterialPageRoute(builder:
-                    (context) => islogged?notificationDemo():LoginPage()
+                    (context) => islogged?HomePage():LoginPage()
                 )
             )
     );
