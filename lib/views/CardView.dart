@@ -3,19 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_share/flutter_share.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:newsdemoapp/models/Bookmark.dart';
+import 'package:newsdemoapp/views/homepage.dart';
 
 import '../helper/NewsDB.dart';
 import '../models/TodaysNews.dart';
 import 'package:like_button/like_button.dart';
 
-class CardView extends StatelessWidget {
+class CardView extends StatefulWidget {
   String? newsSource;
   String? image;
   String? title;
   String? dateTime;
   String? articleURL;
-  List<TodaysNews> news2 = [];
-  bool isClick = false;
 
   CardView({
     required this.newsSource,
@@ -25,10 +24,27 @@ class CardView extends StatelessWidget {
     required this.articleURL,
   });
 
+  @override
+  State<CardView> createState() => _CardViewState();
+}
+
+class _CardViewState extends State<CardView> {
+  List<TodaysNews> news2 = [];
+
+  bool isClick = false;
+
+  bool isBookmarked= false;
+
+
+  @override
+  void initState() {
+    getBookmarked(widget.image.toString());
+  }
+
   Future<void> share() async {
     await FlutterShare.share(
         title: 'Share Article',
-        linkUrl: articleURL,
+        linkUrl: widget.articleURL,
         chooserTitle: 'Example Chooser Title');
   }
 
@@ -43,6 +59,29 @@ class CardView extends StatelessWidget {
 
   }
 
+
+
+  void getBookmarked(String url) async {
+    final database = await $FloorNewsDB.databaseBuilder('NewsDB.db').build();
+
+    final bookmarkDao = database.bookmarkDao;
+
+//  ##  CARE : uncomment to truncate bookmark table
+//     await bookmarkDao.truncateTable();
+
+    List<Bookmark> data1=await bookmarkDao.getAllBookmark();
+
+    for(Bookmark e in data1){
+      debugPrint("BookmarkData item:- ${e.url}");
+      if(e.url == url){
+        debugPrint("BookmarkData item:- ${e.url} found to be bookmarked");
+        setState((){
+          isBookmarked=true;
+        });
+        break;
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +102,7 @@ class CardView extends StatelessWidget {
                       borderRadius: BorderRadius.circular(10),
                       color: Colors.black,
                       image: DecorationImage(
-                          image: CachedNetworkImageProvider(image!), fit: BoxFit.cover)),
+                          image: CachedNetworkImageProvider(widget.image!), fit: BoxFit.cover)),
                 ),
               )),
               Expanded(
@@ -74,7 +113,7 @@ class CardView extends StatelessWidget {
                   children: [
                     Flexible(
                       flex: 3,
-                      child: Text(newsSource!,
+                      child: Text(widget.newsSource!,
                           maxLines: 1,
                           textAlign: TextAlign.start,
                           style: const TextStyle(fontSize: 12)),
@@ -83,7 +122,7 @@ class CardView extends StatelessWidget {
                         flex: 7,
                         child: Container(
                           margin: EdgeInsets.only(top: 5),
-                          child: Text(title!,
+                          child: Text(widget.title!,
                               maxLines: 2,
                               textAlign: TextAlign.start,
                               style: TextStyle(
@@ -94,18 +133,18 @@ class CardView extends StatelessWidget {
                         Container(
                           width: 85,
                           child: Text(
-                            dateTime.toString(),
+                            widget.dateTime.toString(),
                             maxLines: 1,
                             textAlign: TextAlign.start,
                             style: Theme.of(context).textTheme.caption,
                           ),
                         ),
                         SizedBox(width: 10),
-
+                        !isBookmarked?
                         Container(
                           child: IconButton(
                             icon: const Icon(
-                              Icons.book_outlined,
+                              Icons.bookmark_border_outlined,
                             ),
                             iconSize: 20,
                             color: Colors.black,
@@ -118,23 +157,46 @@ class CardView extends StatelessWidget {
                               Fluttertoast.showToast(
                                   msg: "Added bookmark successfully!");
 
-                              
+
                               Bookmark bookmark =
-                                  Bookmark(url: image.toString());
-                              if(bookmark.url==image.toString())
-                                {
-
-                                }
-                              else
-                                {
-
-                                }
+                                  Bookmark(url: widget.image.toString());
                               bookmarkDao.addToBookmark(bookmark);
                               debugPrint("callBookmarkDB:- ${bookmark.url}");
+                              setState((){
+                                isBookmarked=true;
+                              });
                             },
                           ),
 
-                        ), Container(
+                        ):Container(
+                          child: IconButton(
+                            icon: const Icon(
+                              Icons.bookmark,
+                            ),
+                            iconSize: 20,
+                            color: Colors.black,
+                            onPressed: () async {
+                              final database = await $FloorNewsDB
+                                  .databaseBuilder('NewsDB.db')
+                                  .build();
+
+                              final bookmarkDao = database.bookmarkDao;
+                              Fluttertoast.showToast(
+                                  msg: "Removed bookmark successfully!");
+
+
+                              Bookmark bookmark =
+                              Bookmark(url: widget.image.toString());
+                              bookmarkDao.deleteBookmark(widget.image.toString());
+                              debugPrint("callBookmarkDB:- ${bookmark.url}");
+                              setState((){
+                                isBookmarked=false;
+                              });
+
+                            },
+                          ),
+                        ),
+                        Container(
                           child: IconButton(
                             icon: const Icon(
                               Icons.share,
@@ -151,18 +213,6 @@ class CardView extends StatelessWidget {
                   ],
                 ),
               ),
-              // Expanded(
-              //     child: Padding(
-              //       padding: const EdgeInsets.all(6),
-              //       child: Container(
-              //         height: 80,
-              //         decoration: BoxDecoration(
-              //             borderRadius: BorderRadius.circular(10),
-              //             color: Colors.black,
-              //             image: DecorationImage(
-              //                 image: NetworkImage(image!), fit: BoxFit.fill)),
-              //       ),
-              //     )),
             ],
           ),
         ),

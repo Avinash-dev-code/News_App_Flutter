@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:async';
 
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -69,6 +70,7 @@ class _HomePageState extends State<HomePage> {
   String userName = "";
   String usersPhoto = "";
   String photo = "";
+  bool bookmarkLoading = true;
 
   var catList=[];
 
@@ -116,7 +118,7 @@ class _HomePageState extends State<HomePage> {
     //   }
   }
 
-  List<TodaysNews> removeDuplicates(List<TodaysNews> list) {
+  List removeDuplicates(List<TodaysNews> list) {
     // Create a new ArrayList
     List<TodaysNews> newList = <TodaysNews>[];
 
@@ -157,11 +159,19 @@ class _HomePageState extends State<HomePage> {
       } else if (selectedIndex == 1) {
         _onRefresh();
         isHomeVisible = true;
+      }else if (selectedIndex == 2) {
+        _onRefresh();
+        // isHomeVisible = true;
       } else {}
     });
   }
 
   void callBookmark() async {
+
+
+    // bookmarkLoading=true;
+    // setState((){});
+
     final database = await $FloorNewsDB.databaseBuilder('NewsDB.db').build();
     final personDao = database.newsDao;
 
@@ -176,6 +186,7 @@ class _HomePageState extends State<HomePage> {
     finalBookmarkList = (await personDao.getBookmark(urls))!;
     debugPrint("completeBookData1 :- ${urls.toString()}");
     removeDuplicates(finalBookmarkList);
+
   }
 
   void callDB() async {
@@ -234,8 +245,14 @@ class _HomePageState extends State<HomePage> {
 
     callBookmark();
 
+    var FilteredList;
 
-    var FilteredList = widget.list.where((item) => item["isDisable"]=="false").toList();
+if(widget.list != null){
+  FilteredList = widget.list.where((item) => item["isDisable"]=="false").toList();
+}else{
+  FilteredList = widget.list;
+}
+
     catList=FilteredList;
 
     debugPrint("catList:-  ${FilteredList.length}");
@@ -625,35 +642,38 @@ class _HomePageState extends State<HomePage> {
         // callDB();
         // callBookmark();
 
-        child = ListView.builder(
-            itemCount: finalBookmarkList.length,
-            shrinkWrap: true,
-            physics: ClampingScrollPhysics(),
-            itemBuilder: (context, index) {
-              var convertedTimestamp = DateTime.parse(finalBookmarkList[index]
-                  .publshedAt); // Converting into [DateTime] object
-              var result = GetTimeAgo.parse(convertedTimestamp);
-              if (result == ("a day ago")) {
-                result = "1 day ago";
-              } else {
-                result = GetTimeAgo.parse(convertedTimestamp);
-              }
-              if (result == ("an hour ago")) {
-                result = "1 hour ago";
-              } else {
-                result = GetTimeAgo.parse(convertedTimestamp);
-              }
-              final contact = removeDuplicates(finalBookmarkList)[index];
-              debugPrint("NewsDatabseB:- ${finalBookmarkList.length}");
-              return NewsTile(
-                  imgUrl: contact.urlToImage ?? "",
-                  title: contact.title ?? "",
-                  desc: contact.description ?? "",
-                  content: contact.content ?? "",
-                  posturl: contact.articleUrl ?? "",
-                  publishAt: result ?? "",
-                  author: contact.author ?? "");
-            });
+        // child =Text("Hello");
+
+        child =BookmarkTab(finalBookmarkList:finalBookmarkList );
+        // ListView.builder(
+        //     itemCount: finalBookmarkList.length,
+        //     shrinkWrap: true,
+        //     physics: ClampingScrollPhysics(),
+        //     itemBuilder: (context, index) {
+        //       var convertedTimestamp = DateTime.parse(finalBookmarkList[index]
+        //           .publshedAt); // Converting into [DateTime] object
+        //       var result = GetTimeAgo.parse(convertedTimestamp);
+        //       if (result == ("a day ago")) {
+        //         result = "1 day ago";
+        //       } else {
+        //         result = GetTimeAgo.parse(convertedTimestamp);
+        //       }
+        //       if (result == ("an hour ago")) {
+        //         result = "1 hour ago";
+        //       } else {
+        //         result = GetTimeAgo.parse(convertedTimestamp);
+        //       }
+        //       final contact = removeDuplicates(finalBookmarkList)[index];
+        //       debugPrint("NewsDatabseB:- ${finalBookmarkList.length}");
+        //       return NewsTile(
+        //           imgUrl: contact.urlToImage ?? "",
+        //           title: contact.title ?? "",
+        //           desc: contact.description ?? "",
+        //           content: contact.content ?? "",
+        //           posturl: contact.articleUrl ?? "",
+        //           publishAt: result ?? "",
+        //           author: contact.author ?? "");
+        //     });
 
         break;
       case 2:
@@ -739,6 +759,8 @@ class _HomePageState extends State<HomePage> {
             ));
 
         break;
+
+
     }
     return Scaffold(
       appBar: MyAppBar(),
@@ -751,59 +773,11 @@ class _HomePageState extends State<HomePage> {
               physics: const AlwaysScrollableScrollPhysics(),
               onLoading: _onLoading,
               child: SingleChildScrollView(child: child))),
-      // drawer: Drawer(
-      //   // Add a ListView to the drawer. This ensures the user can scroll
-      //   // through the options in the drawer if there isn't enough vertical
-      //   // space to fit everything.
-      //
-      //   child: ListView(
-      //     // Important: Remove any padding from the ListView.
-      //     padding: EdgeInsets.zero,
-      //     children: [
-      //       const SizedBox(
-      //         height: 50,
-      //       ),
-      //       Container(
-      //           child: GestureDetector(
-      //         onTap: () {
-      //           Navigator.of(context)
-      //               .push(MaterialPageRoute(builder: (context) => Profile()));
-      //         },
-      //         child: const CircleAvatar(
-      //           radius: 50,
-      //         ),
-      //       )),
-      //       const SizedBox(
-      //         height: 20,
-      //       ),
-      //       const Text(
-      //         "Avinash",
-      //         textAlign: TextAlign.center,
-      //         style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-      //       ),
-      //       Divider(color: Colors.black),
-      //       ListTile(
-      //         title: const Text('Bookmark'),
-      //         onTap: () {
-      //           Navigator.pop(context);
-      //           Navigator.of(context)
-      //               .push(MaterialPageRoute(builder: (context) => bookmark()));
-      //         },
-      //       ),
-      //       ListTile(
-      //         title: const Text('Newsstand'),
-      //         onTap: () {
-      //           // Update the state of the app
-      //           // ...
-      //           // Then close the drawer
-      //           Navigator.pop(context);
-      //         },
-      //       ),
-      //     ],
-      //   ),
-      // ),
+
       bottomNavigationBar: BottomNavigationBar(
+
         items: const <BottomNavigationBarItem>[
+
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Home',
@@ -829,16 +803,12 @@ class CategoryCard extends StatelessWidget {
 
   CategoryCard({required this.imageAssetUrl, required this.categoryName});
 
+
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        // Navigator.push(
-        //     context,
-        //     MaterialPageRoute(
-        //         builder: (context) => CategoryNews(
-        //               newsCategory: categoryName.toUpperCase(),
-        //             )));
 
         Navigator.push(
             context,
@@ -885,3 +855,70 @@ class CategoryCard extends StatelessWidget {
     );
   }
 }
+
+
+class BookmarkTab extends StatefulWidget {
+  final  finalBookmarkList;
+
+  const BookmarkTab({Key? key, this.finalBookmarkList, }) : super(key: key);
+
+  @override
+  State<BookmarkTab> createState() => _BookmarkTabState();
+}
+class _BookmarkTabState extends State<BookmarkTab> {
+  bool _isLoading = true;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    Future.delayed(Duration(seconds: 1), () {
+      setState(() {
+        _isLoading = false;
+      });
+    });
+  }
+  @override
+  Widget build(BuildContext context) {
+    return _isLoading?SizedBox(
+      height: MediaQuery.of(context).size.height / 1.3,
+      child: Center(
+        child: CircularProgressIndicator(),
+      ),
+    ):widget.finalBookmarkList.length==0?SizedBox(
+      height: MediaQuery.of(context).size.height / 1.3,
+      child: Center(
+        child: Text("No Bookmarks !",style: TextStyle(fontSize: 20)),
+      ),
+    ):ListView.builder(
+        itemCount: widget.finalBookmarkList.length,
+        shrinkWrap: true,
+        physics: ClampingScrollPhysics(),
+        itemBuilder: (context, index) {
+          var convertedTimestamp = DateTime.parse(widget.finalBookmarkList[index]
+              .publshedAt); // Converting into [DateTime] object
+          var result = GetTimeAgo.parse(convertedTimestamp);
+          if (result == ("a day ago")) {
+            result = "1 day ago";
+          } else {
+            result = GetTimeAgo.parse(convertedTimestamp);
+          }
+          if (result == ("an hour ago")) {
+            result = "1 hour ago";
+          } else {
+            result = GetTimeAgo.parse(convertedTimestamp);
+          }
+          // final contact = removeDuplicates(widget.finalBookmarkList)[index];
+          debugPrint("NewsDatabseB:- ${widget.finalBookmarkList.length}");
+          return NewsTile(
+              imgUrl: widget.finalBookmarkList[index].urlToImage ?? "",
+              title: widget.finalBookmarkList[index].title ?? "",
+              desc: widget.finalBookmarkList[index].description ?? "",
+              content: widget.finalBookmarkList[index].content ?? "",
+              posturl: widget.finalBookmarkList[index].articleUrl ?? "",
+              publishAt: result ?? "",
+              author: widget.finalBookmarkList[index].author ?? "");
+        });
+  }
+}
+
