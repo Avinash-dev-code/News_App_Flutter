@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:awesome_dialog/awesome_dialog.dart';
@@ -34,7 +35,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage();
+  final list;
+
+  const HomePage({Key? key,  this.list}) : super(key: key);
+  // const HomePage();
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -65,6 +69,8 @@ class _HomePageState extends State<HomePage> {
   String userName = "";
   String usersPhoto = "";
   String photo = "";
+
+  var catList=[];
 
   Future getNews() async {
     WidgetsFlutterBinding.ensureInitialized();
@@ -210,6 +216,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
+
     _loading = true;
     // TODO: implement initState
     super.initState();
@@ -217,6 +224,7 @@ class _HomePageState extends State<HomePage> {
     var formatter = DateFormat('yyyy-MM-dd');
     formattedDate = formatter.format(now);
     categories = getCategories();
+
     getName();
     // _onRefresh();
     getNews();
@@ -225,7 +233,19 @@ class _HomePageState extends State<HomePage> {
     getImage();
 
     callBookmark();
+
+
+    var FilteredList = widget.list.where((item) => item["isDisable"]=="false").toList();
+    catList=FilteredList;
+
+    debugPrint("catList:-  ${FilteredList.length}");
+    for (dynamic e in FilteredList) {
+      debugPrint("catList item:- $e");
+
+
+    }
   }
+
 
   void _onRefresh() async {
     await Future.delayed(const Duration(seconds: 1));
@@ -480,11 +500,11 @@ class _HomePageState extends State<HomePage> {
             height: 70,
             child: ListView.builder(
                 scrollDirection: Axis.horizontal,
-                itemCount: categories.length,
+                itemCount: catList.length,
                 itemBuilder: (context, index) {
                   return CategoryCard(
-                    imageAssetUrl: categories[index].imageAssetUrl,
-                    categoryName: categories[index].categorieName,
+                    imageAssetUrl: catList[index]["imageAssetUrl"],
+                    categoryName: catList[index]["categorieName"],
                   );
                 }),
           ),

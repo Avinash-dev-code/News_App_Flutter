@@ -57,12 +57,12 @@ class News {
           //   articleUrl: element["url"],
           // );
           TodaysNews todaysNews = TodaysNews(
-              title: element['title'],
+              title: element['title']!,
               author: element['author']!,
-              description: element['description'],
-              urlToImage: element['urlToImage'],
-              publshedAt: element['publishedAt'],
-              content: element["content"],
+              description: element['description']!,
+              urlToImage: element['urlToImage']!,
+              publshedAt: element['publishedAt']!,
+              content: element["content"]!,
               articleUrl: element["url"]);
            newsList.add(todaysNews);
 

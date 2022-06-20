@@ -2,6 +2,7 @@
 
 import 'package:floor/floor.dart';
 
+
 import '../models/TodaysNews.dart';
 
 @dao

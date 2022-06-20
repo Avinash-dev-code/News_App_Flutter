@@ -63,43 +63,20 @@ class SplashScreenState extends State<SplashScreen> {
     super.initState();
     getLogged();
     List<CategorieModel> category=[];
-    final array1=[{"categorieName": "Business","isDisable":"false","imageAssetUrl":"https://images.unsplash.com/photo-1507679799987-c73779587ccf?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1502&q=80"},{"categorieName": "Science","isDisable":"false","imageAssetUrl":"https://images.unsplash.com/photo-1507679799987-c73779587ccf?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1502&q=80"},{"categorieName": "Health","isDisable":"false","imageAssetUrl":"https://images.unsplash.com/photo-1507679799987-c73779587ccf?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1502&q=80"}];
-    // for (int i = 0; i < array1.length; i++) {
-    //   CategorieModel categorieModel = new CategorieModel();
-    //   categorieModel.categorieName =array1[i]["categorieName"].toString();
-    //   categorieModel.isDisable=array1[i]["isDisable"].toString();
-    //   categorieModel.imageAssetUrl = array1[i]["imageAssetUrl"].toString();
-    //   category.add(categorieModel);
-    //
-    // }
-    // debugPrint("findList:- ${array1[0]["categorieName"]}");
-    // CategorieModel categorieModel = new CategorieModel();
-    // categorieModel.categorieName = "Business";
-    // categorieModel.isDisable=true;
-    // categorieModel.imageAssetUrl = "https://images.unsplash.com/photo-1507679799987-c73779587ccf?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1502&q=80";
-    // category.add(categorieModel);
-    //
-    // //2
-    // CategorieModel categorieModel2 = new CategorieModel();
-    // categorieModel2.isDisable=true;
-    //
-    // categorieModel2.categorieName = "Entertainment";
-    // categorieModel2.imageAssetUrl = "https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1500&q=80";
-    // category.add(categorieModel2);
-    //
-    // //3
-    // CategorieModel categorieModel3 = new CategorieModel();
-    // categorieModel3.isDisable=false;
-    //
-    // categorieModel3.categorieName = "General";
-    // categorieModel3.imageAssetUrl = "https://images.unsplash.com/photo-1495020689067-958852a7765e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60";
-    // category.add(categorieModel3);
-    // ReorderedListView(list: array1)
+    final array1=[{"categorieName": "General","isDisable":"false","imageAssetUrl":"https://images.unsplash.com/photo-1495020689067-958852a7765e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60"},
+      {"categorieName": "Business","isDisable":"false","imageAssetUrl":"https://images.unsplash.com/photo-1507679799987-c73779587ccf?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1502&q=80"},
+      {"categorieName": "Science","isDisable":"false","imageAssetUrl":"https://images.unsplash.com/photo-1507679799987-c73779587ccf?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1502&q=80"},
+      {"categorieName": "Health","isDisable":"false","imageAssetUrl":"https://images.unsplash.com/photo-1507679799987-c73779587ccf?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1502&q=80"},
+      {"categorieName": "Entertainment","isDisable":"false","imageAssetUrl":"https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1500&q=80"},
+      {"categorieName": "Sports","isDisable":"false","imageAssetUrl":"https://images.unsplash.com/photo-1495563923587-bdc4282494d0?ixlib=rb-1.2.1&auto=format&fit=crop&w=1500&q=80"},
+      {"categorieName": "Technology","isDisable":"false","imageAssetUrl":"https://images.unsplash.com/photo-1519389950473-47ba0277781c?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1500&q=80"},
+    ];
+
     Timer(const Duration(seconds: 2),
             () =>
             Navigator.pushReplacement(context,
                 MaterialPageRoute(builder:
-                    (context) => islogged?HomePage():LoginPage()
+                    (context) => islogged?ReorderedListView(list: array1):LoginPage()
                 )
             )
     );

@@ -13,8 +13,6 @@ abstract class BookmarkDao {
   @Query("DELETE FROM Bookmark WHERE url = :url")
   Future<void> deleteBookmark(String url);
 
-
-
   @Insert(onConflict: OnConflictStrategy.replace)
   Future<void> addToBookmark(Bookmark bookmark);
 }

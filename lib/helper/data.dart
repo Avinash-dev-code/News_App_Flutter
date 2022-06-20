@@ -5,6 +5,8 @@ List<CategorieModel> getCategories(){
   List<CategorieModel> myCategories = <CategorieModel>[];
   CategorieModel categorieModel;
 
+
+
   //1
   categorieModel = new CategorieModel();
   categorieModel.categorieName = "Business";

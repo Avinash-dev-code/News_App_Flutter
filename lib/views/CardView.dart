@@ -40,23 +40,7 @@ class CardView extends StatelessWidget {
     bookmarkDao.addToBookmark(bookmark);
 
     debugPrint("callDB:- $bookmark");
-    //
-    // for (TodaysNews e in news2) {
-    //   urls.add(e.urlToImage);
-    //
-    // }
-    // bookmark=(await personDao.getBookmark(urls))!;
-    // for (TodaysNews e in bookmark) {
-    //   debugPrint("completeBookData :- ${e.urlToImage}");
-    // }
-    // for(TodaysNews e in news2)
-    //   {
-    // final ischeck=await personDao.isTitle(e.title);
-    //     if(ischeck==true) {
-    //       await personDao.update(e.title,e.author,e.description, e.urlToImage, e.publshedAt, e.content, e.articleUrl);
-    //
-    //     }
-    //   }
+
   }
 
 
@@ -117,14 +101,7 @@ class CardView extends StatelessWidget {
                           ),
                         ),
                         SizedBox(width: 10),
-                        Container(
-                          child: TextButton(
-                            onPressed: () {
-                              share();
-                            },
-                            child: Text("Share"),
-                          ),
-                        ),
+
                         Container(
                           child: IconButton(
                             icon: const Icon(
@@ -156,32 +133,19 @@ class CardView extends StatelessWidget {
                               debugPrint("callBookmarkDB:- ${bookmark.url}");
                             },
                           ),
-                          // child: LikeButton(
-                          //   size: 30,
-                          //   circleColor: CircleColor(
-                          //       start: Color(0xff00ddff),
-                          //       end: Color(0xff0099cc)),
-                          //   bubblesColor: const BubblesColor(
-                          //     dotPrimaryColor: Color(0xff33b5e5),
-                          //     dotSecondaryColor: Color(0xff0099cc),
-                          //   ),
-                          //   likeBuilder: (bool isLiked) {
-                          //     if (isLiked == true) {
-                          //       isClick = true;
-                          //     }
-                          //     debugPrint("bookmarkClicked:- $isLiked");
-                          //
-                          //     return Icon(
-                          //       Icons.bookmark,
-                          //       color: isLiked
-                          //           ? Colors.deepPurpleAccent
-                          //           : Colors.grey,
-                          //       size: 22,
-                          //     );
-                          //   },
-                          //   onTap: onLikeButtonTapped,
-                          // ),
-                        )
+
+                        ), Container(
+                          child: IconButton(
+                            icon: const Icon(
+                              Icons.share,
+                            ),
+                            iconSize: 20,
+                            color: Colors.black,
+                            onPressed: () {
+                              share();
+                            },
+                          ),
+                        ),
                       ],
                     )
                   ],
