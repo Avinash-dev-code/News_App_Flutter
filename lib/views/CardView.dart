@@ -187,8 +187,8 @@ class _CardViewState extends State<CardView> {
 
                               Bookmark bookmark =
                               Bookmark(url: widget.image.toString());
-                              bookmarkDao.deleteBookmark(widget.image.toString());
                               debugPrint("callBookmarkDB:- ${bookmark.url}");
+                              bookmarkDao.deleteBookmark(widget.image.toString());
                               setState((){
                                 isBookmarked=false;
                               });

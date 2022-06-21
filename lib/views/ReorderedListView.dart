@@ -45,6 +45,7 @@ class _MyAppState extends State<ReorderedListView> {
     debugPrint("widgetList:- ${widget.list.length}");
   }
 
+
   dialogContent(BuildContext context) {
     return Stack(
       children: <Widget>[
@@ -384,15 +385,19 @@ class _MyAppState extends State<ReorderedListView> {
           title: const Text('Drag And drop Category'),
         ),
         body: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             DragAndDropGridView(
               controller: ScrollController(),
+
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
                 childAspectRatio: 2.1,
               ),
               padding: EdgeInsets.only(top: 20),
               itemBuilder: (context, index) => Stack(
+
                   alignment: Alignment.topCenter,
                   children: (<Widget>[
                     if (_imageUris[index]["isDisable"] == "false")
@@ -436,6 +441,7 @@ class _MyAppState extends State<ReorderedListView> {
 
                   ])),
               itemCount: _imageUris.length,
+
               onWillAccept: (oldIndex, newIndex) {
                 debugPrint("onWillAccept:- $oldIndex $newIndex");
                 // Implement you own logic

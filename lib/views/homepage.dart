@@ -10,7 +10,10 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
+import 'package:newsdemoapp/views/Profile.dart';
+import 'package:newsdemoapp/views/ReorderedListView.dart';
 import 'package:newsdemoapp/views/login_page.dart';
+import 'package:newsdemoapp/views/Profile_Page.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -38,7 +41,8 @@ import 'package:firebase_core/firebase_core.dart';
 class HomePage extends StatefulWidget {
   final list;
 
-  const HomePage({Key? key,  this.list}) : super(key: key);
+  const HomePage({Key? key, this.list}) : super(key: key);
+
   // const HomePage();
 
   @override
@@ -72,7 +76,7 @@ class _HomePageState extends State<HomePage> {
   String photo = "";
   bool bookmarkLoading = true;
 
-  var catList=[];
+  var catList = [];
 
   Future getNews() async {
     WidgetsFlutterBinding.ensureInitialized();
@@ -89,7 +93,6 @@ class _HomePageState extends State<HomePage> {
       dbList = News.newsList;
       debugPrint("apiList:- ${dbList.length}  ${News.newsList.length}");
     } else {
-
       final database = await $FloorNewsDB.databaseBuilder('NewsDB.db').build();
 
       final personDao = database.newsDao;
@@ -159,7 +162,7 @@ class _HomePageState extends State<HomePage> {
       } else if (selectedIndex == 1) {
         _onRefresh();
         isHomeVisible = true;
-      }else if (selectedIndex == 2) {
+      } else if (selectedIndex == 2) {
         _onRefresh();
         // isHomeVisible = true;
       } else {}
@@ -167,8 +170,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   void callBookmark() async {
-
-
     // bookmarkLoading=true;
     // setState((){});
 
@@ -186,7 +187,6 @@ class _HomePageState extends State<HomePage> {
     finalBookmarkList = (await personDao.getBookmark(urls))!;
     debugPrint("completeBookData1 :- ${urls.toString()}");
     removeDuplicates(finalBookmarkList);
-
   }
 
   void callDB() async {
@@ -227,7 +227,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
-
     _loading = true;
     // TODO: implement initState
     super.initState();
@@ -241,28 +240,21 @@ class _HomePageState extends State<HomePage> {
     getNews();
     getTopHeadlineNews();
     callDB();
-    getImage();
+    // getImage();
 
     callBookmark();
 
     var FilteredList;
 
-if(widget.list != null){
-  FilteredList = widget.list.where((item) => item["isDisable"]=="false").toList();
-}else{
-  FilteredList = widget.list;
-}
-
-    catList=FilteredList;
-
-    debugPrint("catList:-  ${FilteredList.length}");
-    for (dynamic e in FilteredList) {
-      debugPrint("catList item:- $e");
-
-
+    if (widget.list != null) {
+      FilteredList =
+          widget.list.where((item) => item["isDisable"] == "false").toList();
+      catList = FilteredList;
     }
+// else{
+//   FilteredList = widget.list;
+// }
   }
-
 
   void _onRefresh() async {
     await Future.delayed(const Duration(seconds: 1));
@@ -320,127 +312,121 @@ if(widget.list != null){
   //   //     }
   //   //   }
   // }
-  Future<Position> _determinePosition() async {
-    bool serviceEnabled;
-    LocationPermission permission;
 
-    // Test if location services are enabled.
-    Geolocator.requestPermission();
-
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      AwesomeDialog(
-        context: context,
-        dialogType: DialogType.NO_HEADER,
-        animType: AnimType.BOTTOMSLIDE,
-        title: 'Location Permission',
-        desc: 'allow news app to access your location',
-        btnCancelOnPress: () {},
-        btnOkOnPress: () {
-          Geolocator.openLocationSettings();
-
-        },
-      ).show();
-
-      return Future.error('Location services are disabled.');
-    }
-
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        // Permissions are denied, next time you could try
-        // requesting permissions again (this is also where
-        // Android's shouldShowRequestPermissionRationale
-        // returned true. According to Android guidelines
-        // your App should show an explanatory UI now.
-
-        return Future.error('Location permissions are denied');
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      // Permissions are denied forever, handle appropriately.
-      Geolocator.openLocationSettings();
-
-      return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
-    }
-
-    // When we reach here, permissions are granted and we can
-    // continue accessing the position of the device.
-    var position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-    var lat = position.latitude;
-    var long = position.longitude;
-
-    // passing this to latitude and longitude strings
-    latitude = "$lat";
-    longitude = "$long";
-    // getNamebyCordinates();
-    // if (lat == null || long == null) return double.parse("");
-
-    List<Placemark> placemarks =
-        await placemarkFromCoordinates(position.latitude, position.longitude);
-    debugPrint("location :- $placemarks $latitude  $longitude");
-    setState(() {
-      locationMessage =
-          "${placemarks[0].subLocality},${placemarks[0].locality}";
-    });
-    return await Geolocator.getCurrentPosition();
-  }
-
-  getFromCamera() async {
-    var image = await ImagePicker().pickImage(source: ImageSource.camera);
-    if (image != null) {
-      debugPrint("Camera Image:-  $image");
-      setState(() {
-        imageFile = File(image.path);
-        savedProfileImage(imageFile.path.toString());
-        getImage();
-
-      });
-
-    }
-  }
-
-  getFromGallery() async {
-    var image = await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (image != null) {
-      debugPrint("Gallery Image:-  $image");
-      // imageFile = File(image.path);
-      setState(() {
-        imageFile = File(image.path);
-        savedProfileImage(imageFile.path.toString());
-        getImage();
-
-      });
-    }
-  }
-
-  showAlertDialog(BuildContext context) {
-    // Navigator.of(context, rootNavigator: true).pop('dialog');
-    // set up the button
-
-    AwesomeDialog(
-      context: context,
-      dialogType: DialogType.NO_HEADER,
-      animType: AnimType.BOTTOMSLIDE,
-      title: 'Permission',
-      desc: 'allow news app to access your camera and storage',
-      btnCancelOnPress: () {
-        getFromCamera();
-      },
-      btnCancelText: "Camera",
-      btnOkText: "Gallery",
-      btnOkOnPress: () {
-        getFromGallery();
-      },
-    ).show();
-
-
-
-  }
+  // Future<Position> _determinePosition() async {
+  //   bool serviceEnabled;
+  //   LocationPermission permission;
+  //
+  //   // Test if location services are enabled.
+  //   Geolocator.requestPermission();
+  //
+  //   serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  //   if (!serviceEnabled) {
+  //     AwesomeDialog(
+  //       context: context,
+  //       dialogType: DialogType.NO_HEADER,
+  //       animType: AnimType.BOTTOMSLIDE,
+  //       title: 'Location Permission',
+  //       desc: 'allow news app to access your location',
+  //       btnCancelOnPress: () {},
+  //       btnOkOnPress: () {
+  //         Geolocator.openLocationSettings();
+  //       },
+  //     ).show();
+  //
+  //     return Future.error('Location services are disabled.');
+  //   }
+  //
+  //   permission = await Geolocator.checkPermission();
+  //   if (permission == LocationPermission.denied) {
+  //     permission = await Geolocator.requestPermission();
+  //     if (permission == LocationPermission.denied) {
+  //       // Permissions are denied, next time you could try
+  //       // requesting permissions again (this is also where
+  //       // Android's shouldShowRequestPermissionRationale
+  //       // returned true. According to Android guidelines
+  //       // your App should show an explanatory UI now.
+  //
+  //       return Future.error('Location permissions are denied');
+  //     }
+  //   }
+  //
+  //   if (permission == LocationPermission.deniedForever) {
+  //     // Permissions are denied forever, handle appropriately.
+  //     Geolocator.openLocationSettings();
+  //
+  //     return Future.error(
+  //         'Location permissions are permanently denied, we cannot request permissions.');
+  //   }
+  //
+  //   // When we reach here, permissions are granted and we can
+  //   // continue accessing the position of the device.
+  //   var position = await Geolocator.getCurrentPosition(
+  //       desiredAccuracy: LocationAccuracy.high);
+  //   var lat = position.latitude;
+  //   var long = position.longitude;
+  //
+  //   // passing this to latitude and longitude strings
+  //   latitude = "$lat";
+  //   longitude = "$long";
+  //   // getNamebyCordinates();
+  //   // if (lat == null || long == null) return double.parse("");
+  //
+  //   List<Placemark> placemarks =
+  //       await placemarkFromCoordinates(position.latitude, position.longitude);
+  //   debugPrint("location :- $placemarks $latitude  $longitude");
+  //   setState(() {
+  //     locationMessage =
+  //         "${placemarks[0].subLocality},${placemarks[0].locality}";
+  //   });
+  //   return await Geolocator.getCurrentPosition();
+  // }
+  //
+  // getFromCamera() async {
+  //   var image = await ImagePicker().pickImage(source: ImageSource.camera);
+  //   if (image != null) {
+  //     debugPrint("Camera Image:-  $image");
+  //     setState(() {
+  //       imageFile = File(image.path);
+  //       savedProfileImage(imageFile.path.toString());
+  //       getImage();
+  //     });
+  //   }
+  // }
+  //
+  // getFromGallery() async {
+  //   var image = await ImagePicker().pickImage(source: ImageSource.gallery);
+  //   if (image != null) {
+  //     debugPrint("Gallery Image:-  $image");
+  //     // imageFile = File(image.path);
+  //     setState(() {
+  //       imageFile = File(image.path);
+  //       savedProfileImage(imageFile.path.toString());
+  //       getImage();
+  //     });
+  //   }
+  // }
+  //
+  // showAlertDialog(BuildContext context) {
+  //   // Navigator.of(context, rootNavigator: true).pop('dialog');
+  //   // set up the button
+  //
+  //   AwesomeDialog(
+  //     context: context,
+  //     dialogType: DialogType.NO_HEADER,
+  //     animType: AnimType.BOTTOMSLIDE,
+  //     title: 'Permission',
+  //     desc: 'allow news app to access your camera and storage',
+  //     btnCancelOnPress: () {
+  //       getFromCamera();
+  //     },
+  //     btnCancelText: "Camera",
+  //     btnOkText: "Gallery",
+  //     btnOkOnPress: () {
+  //       getFromGallery();
+  //     },
+  //   ).show();
+  // }
 
   Future<void> getName() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -450,11 +436,11 @@ if(widget.list != null){
     debugPrint("isPhoto:= $userName $photo");
   }
 
-  Future<void> getImage() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    usersPhoto = prefs.getString("photo")!;
-    debugPrint("Profile Image:- ${usersPhoto}");
-  }
+  // Future<void> getImage() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   usersPhoto = prefs.getString("photo")!;
+  //   debugPrint("Profile Image:- ${usersPhoto}");
+  // }
 
   Future<void> savedProfileImage(String profileImage) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -525,62 +511,64 @@ if(widget.list != null){
                   );
                 }),
           ),
-              const SizedBox(
-                height: 5,
-              ),
+          const SizedBox(
+            height: 5,
+          ),
 
           ///Top Headlines
-            Visibility(
-                visible: topHeadlineList.length==0?false:true,
-                child: Column(children: [
-              Container(
-                alignment: Alignment.topLeft,
-                margin: EdgeInsets.only(left: 20),
-                child: const Text(
-                  "Top Headlines",
-                  maxLines: 1,
-                  textAlign: TextAlign.start,
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 18,
-                      fontStyle: FontStyle.normal,
-                      fontWeight: FontWeight.bold),
-                ),
-              ),
-              Container(
-                margin: const EdgeInsets.symmetric(vertical: 20.0),
-                height: 200.0,
-                child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: topHeadlineList.length,
-                    shrinkWrap: true,
-                    physics: ClampingScrollPhysics(),
-                    itemBuilder: (context, index) {
-                      var convertedTimestamp = DateTime.parse(topHeadlineList[index]
-                          .publshedAt); // Converting into [DateTime] object
-                      var result = GetTimeAgo.parse(convertedTimestamp);
-                      if (result == ("a day ago")) {
-                        result = "1 day ago";
-                      } else {
-                        result = GetTimeAgo.parse(convertedTimestamp);
-                      }
-                      if (result == ("an hour ago")) {
-                        result = "1 hour ago";
-                      } else {
-                        result = GetTimeAgo.parse(convertedTimestamp);
-                      }
-                      return NewsTile2(
-                          imgUrl1: topHeadlineList[index].urlToImage ?? "",
-                          title1: topHeadlineList[index].title ?? "",
-                          desc1: topHeadlineList[index].description ?? "",
-                          content1: topHeadlineList[index].content ?? "",
-                          posturl1: topHeadlineList[index].articleUrl ?? "",
-                          publishAt1: result ?? "",
-                          author1: topHeadlineList[index].author ?? "");
-                    }),
-              )
-
-            ],)),
+          Visibility(
+              visible: topHeadlineList.length == 0 ? false : true,
+              child: Column(
+                children: [
+                  Container(
+                    alignment: Alignment.topLeft,
+                    margin: EdgeInsets.only(left: 20),
+                    child: const Text(
+                      "Top Headlines",
+                      maxLines: 1,
+                      textAlign: TextAlign.start,
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 18,
+                          fontStyle: FontStyle.normal,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  Container(
+                    margin: const EdgeInsets.symmetric(vertical: 20.0),
+                    height: 200.0,
+                    child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: topHeadlineList.length,
+                        shrinkWrap: true,
+                        physics: ClampingScrollPhysics(),
+                        itemBuilder: (context, index) {
+                          var convertedTimestamp = DateTime.parse(topHeadlineList[
+                                  index]
+                              .publshedAt); // Converting into [DateTime] object
+                          var result = GetTimeAgo.parse(convertedTimestamp);
+                          if (result == ("a day ago")) {
+                            result = "1 day ago";
+                          } else {
+                            result = GetTimeAgo.parse(convertedTimestamp);
+                          }
+                          if (result == ("an hour ago")) {
+                            result = "1 hour ago";
+                          } else {
+                            result = GetTimeAgo.parse(convertedTimestamp);
+                          }
+                          return NewsTile2(
+                              imgUrl1: topHeadlineList[index].urlToImage ?? "",
+                              title1: topHeadlineList[index].title ?? "",
+                              desc1: topHeadlineList[index].description ?? "",
+                              content1: topHeadlineList[index].content ?? "",
+                              posturl1: topHeadlineList[index].articleUrl ?? "",
+                              publishAt1: result ?? "",
+                              author1: topHeadlineList[index].author ?? "");
+                        }),
+                  )
+                ],
+              )),
 
           ///News For you
           Column(
@@ -644,7 +632,7 @@ if(widget.list != null){
 
         // child =Text("Hello");
 
-        child =BookmarkTab(finalBookmarkList:finalBookmarkList );
+        child = BookmarkTab(finalBookmarkList: finalBookmarkList);
         // ListView.builder(
         //     itemCount: finalBookmarkList.length,
         //     shrinkWrap: true,
@@ -677,90 +665,13 @@ if(widget.list != null){
 
         break;
       case 2:
-        child = Container(
-            height: 500,
-            child: Column(
-              children: <Widget>[
-                Stack(
-                  children: <Widget>[
-                    Container(
-                      height: 200,
-                      decoration: BoxDecoration(
-                          color: Colors.black,
-                          image: DecorationImage(
-                              colorFilter: ColorFilter.mode(
-                                  Colors.black.withOpacity(0.7),
-                                  BlendMode.dstATop),
-                              image: CachedNetworkImageProvider("https://img.freepik.com/free-vector/flat-geometric-background_23-2149329827.jpg?t=st=1655459147~exp=1655459747~hmac=5c8e9adb11f8f20c68cb5f1b14828c3ae7fbca7706211895af0bffc87fbdcb9b&w=996"),
-                              fit: BoxFit.cover)),
-                    ),
-                    Container(
-                        alignment: Alignment.center,
-                        margin: const EdgeInsets.only(top: 130),
-                        child: Column(
-                          children: <Widget>[
-                            GestureDetector(
-                              onTap: () {
-                                //Do something
-                                // getFromCamera();
-                                showAlertDialog(context);
-                              },
-                              child: CircleAvatar(
-                                  radius: 60,
-                                  backgroundImage:usersPhoto.contains("https")?CachedNetworkImageProvider(usersPhoto):Image.file(File(usersPhoto)).image),
-                            ),
-                            SizedBox(height: 10),
-                            Text(
-                              userName,
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 20),
-                            ),
-                          ],
-                        )),
-                  ],
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    _determinePosition();
-                  },
-                  child: const Text("Get Current Location"),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                Text(
-                  locationMessage,
-                  style: const TextStyle(
-                    fontSize: 20,
-                    color: Colors.blue,
-                  ),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    signOutGoogle();
-                    Navigator.pushReplacement(
-                        context,
-                        PageTransition(
-                            type: PageTransitionType.leftToRight,
-                            child: LoginPage()));
-                  },
-                  child: const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Text(
-                      'Sign Out',
-                      style: TextStyle(fontSize: 20, color: Colors.white),
-                    ),
-                  ),
-                )
-              ],
-            ));
+        child = Profile_Page();
 
         break;
 
-
+      case 3:
+        // child=ReorderedListView(list: catList);
+        break;
     }
     return Scaffold(
       appBar: MyAppBar(),
@@ -773,25 +684,30 @@ if(widget.list != null){
               physics: const AlwaysScrollableScrollPhysics(),
               onLoading: _onLoading,
               child: SingleChildScrollView(child: child))),
-
       bottomNavigationBar: BottomNavigationBar(
-
         items: const <BottomNavigationBarItem>[
-
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Home',
+            backgroundColor: Colors.blue,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.bookmark),
-            label: 'Bookmark',
-          ),
+              icon: Icon(Icons.bookmark),
+              label: 'Bookmark',
+              backgroundColor: Colors.blue),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
+              icon: Icon(Icons.person),
+              label: 'Profile',
+              backgroundColor: Colors.blue),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.category),
+              label: 'Categories',
+              activeIcon: Icon(Icons.category, color: Colors.black),
+              tooltip: "Categories",
+              backgroundColor: Colors.blue),
         ],
-        currentIndex: selectedIndex, //New
+        currentIndex: selectedIndex,
+        selectedItemColor: Colors.black, //New
         onTap: _onItemTapped,
       ),
     );
@@ -803,13 +719,10 @@ class CategoryCard extends StatelessWidget {
 
   CategoryCard({required this.imageAssetUrl, required this.categoryName});
 
-
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-
         Navigator.push(
             context,
             PageTransition(
@@ -856,17 +769,21 @@ class CategoryCard extends StatelessWidget {
   }
 }
 
-
 class BookmarkTab extends StatefulWidget {
-  final  finalBookmarkList;
+  final finalBookmarkList;
 
-  const BookmarkTab({Key? key, this.finalBookmarkList, }) : super(key: key);
+  const BookmarkTab({
+    Key? key,
+    this.finalBookmarkList,
+  }) : super(key: key);
 
   @override
   State<BookmarkTab> createState() => _BookmarkTabState();
 }
+
 class _BookmarkTabState extends State<BookmarkTab> {
   bool _isLoading = true;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -878,47 +795,53 @@ class _BookmarkTabState extends State<BookmarkTab> {
       });
     });
   }
+
   @override
   Widget build(BuildContext context) {
-    return _isLoading?SizedBox(
-      height: MediaQuery.of(context).size.height / 1.3,
-      child: Center(
-        child: CircularProgressIndicator(),
-      ),
-    ):widget.finalBookmarkList.length==0?SizedBox(
-      height: MediaQuery.of(context).size.height / 1.3,
-      child: Center(
-        child: Text("No Bookmarks !",style: TextStyle(fontSize: 20)),
-      ),
-    ):ListView.builder(
-        itemCount: widget.finalBookmarkList.length,
-        shrinkWrap: true,
-        physics: ClampingScrollPhysics(),
-        itemBuilder: (context, index) {
-          var convertedTimestamp = DateTime.parse(widget.finalBookmarkList[index]
-              .publshedAt); // Converting into [DateTime] object
-          var result = GetTimeAgo.parse(convertedTimestamp);
-          if (result == ("a day ago")) {
-            result = "1 day ago";
-          } else {
-            result = GetTimeAgo.parse(convertedTimestamp);
-          }
-          if (result == ("an hour ago")) {
-            result = "1 hour ago";
-          } else {
-            result = GetTimeAgo.parse(convertedTimestamp);
-          }
-          // final contact = removeDuplicates(widget.finalBookmarkList)[index];
-          debugPrint("NewsDatabseB:- ${widget.finalBookmarkList.length}");
-          return NewsTile(
-              imgUrl: widget.finalBookmarkList[index].urlToImage ?? "",
-              title: widget.finalBookmarkList[index].title ?? "",
-              desc: widget.finalBookmarkList[index].description ?? "",
-              content: widget.finalBookmarkList[index].content ?? "",
-              posturl: widget.finalBookmarkList[index].articleUrl ?? "",
-              publishAt: result ?? "",
-              author: widget.finalBookmarkList[index].author ?? "");
-        });
+    return _isLoading
+        ? SizedBox(
+            height: MediaQuery.of(context).size.height / 1.3,
+            child: Center(
+              child: CircularProgressIndicator(),
+            ),
+          )
+        : widget.finalBookmarkList.length == 0
+            ? SizedBox(
+                height: MediaQuery.of(context).size.height / 1.3,
+                child: Center(
+                  child: Text("No Bookmarks !", style: TextStyle(fontSize: 20)),
+                ),
+              )
+            : ListView.builder(
+                itemCount: widget.finalBookmarkList.length,
+                shrinkWrap: true,
+                physics: ClampingScrollPhysics(),
+                itemBuilder: (context, index) {
+                  var convertedTimestamp = DateTime.parse(widget
+                      .finalBookmarkList[index]
+                      .publshedAt); // Converting into [DateTime] object
+                  var result = GetTimeAgo.parse(convertedTimestamp);
+                  if (result == ("a day ago")) {
+                    result = "1 day ago";
+                  } else {
+                    result = GetTimeAgo.parse(convertedTimestamp);
+                  }
+                  if (result == ("an hour ago")) {
+                    result = "1 hour ago";
+                  } else {
+                    result = GetTimeAgo.parse(convertedTimestamp);
+                  }
+                  // final contact = removeDuplicates(widget.finalBookmarkList)[index];
+                  debugPrint(
+                      "NewsDatabseB:- ${widget.finalBookmarkList.length}");
+                  return NewsTile(
+                      imgUrl: widget.finalBookmarkList[index].urlToImage ?? "",
+                      title: widget.finalBookmarkList[index].title ?? "",
+                      desc: widget.finalBookmarkList[index].description ?? "",
+                      content: widget.finalBookmarkList[index].content ?? "",
+                      posturl: widget.finalBookmarkList[index].articleUrl ?? "",
+                      publishAt: result ?? "",
+                      author: widget.finalBookmarkList[index].author ?? "");
+                });
   }
 }
-
