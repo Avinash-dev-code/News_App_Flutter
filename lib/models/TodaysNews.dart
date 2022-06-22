@@ -20,7 +20,6 @@ class TodaysNews {
   String articleUrl;
 
 
-
   TodaysNews({
       this.id,
       required this.title,

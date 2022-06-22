@@ -61,12 +61,12 @@ class NewsTile extends StatelessWidget {
         child: Container(
             child: Padding(
           padding: const EdgeInsets.only(left: 10, right: 10),
-          child: CardView(
-            newsSource: author,
-            image: imgUrl,
-            title: title,
-            dateTime: publishAt,
-            articleURL: posturl,
+            child: CardView(
+             newsSource: author,
+             image: imgUrl,
+             title: title,
+             dateTime: publishAt,
+             articleURL: posturl,
           ),
         )));
   }

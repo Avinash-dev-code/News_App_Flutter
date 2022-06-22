@@ -72,6 +72,7 @@ dev_dependencies:
   firebase_auth: ^3.3.19
   shared_preferences: ^2.0.15
   google_sign_in: ^5.3.3
+  fl_chart: ^0.55.0
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
   # activated in the `analysis_options.yaml` file located at the root of your

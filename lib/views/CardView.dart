@@ -26,6 +26,7 @@ class CardView extends StatefulWidget {
 
   @override
   State<CardView> createState() => _CardViewState();
+
 }
 
 class _CardViewState extends State<CardView> {
@@ -122,7 +123,8 @@ class _CardViewState extends State<CardView> {
                         flex: 7,
                         child: Container(
                           margin: EdgeInsets.only(top: 5),
-                          child: Text(widget.title!,
+                          child:
+                          Text(widget.title!,
                               maxLines: 2,
                               textAlign: TextAlign.start,
                               style: TextStyle(

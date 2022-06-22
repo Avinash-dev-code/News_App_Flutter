@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:ffi';
 import 'dart:io';
 import 'dart:async';
@@ -8,6 +9,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:newsdemoapp/helper/NewsDao.dart';
 import 'package:newsdemoapp/models/categorie_model.dart';
 import 'package:newsdemoapp/views/ReorderedListView.dart';
+import 'package:newsdemoapp/views/WebscoketDemo.dart';
 import 'package:newsdemoapp/views/homepage.dart';
 import 'package:newsdemoapp/views/notificationDemo.dart';
 import 'package:newsdemoapp/views/login_page.dart';
@@ -57,13 +59,17 @@ class SplashScreen extends StatefulWidget {
 }
 
 class SplashScreenState extends State<SplashScreen> {
-  bool islogged=false;
+  bool islogged = false;
+  List<dynamic> stringData = [];
+
   @override
   void initState() {
     super.initState();
     getLogged();
-    List<CategorieModel> category=[];
-    final array1=[{"categorieName": "General","isDisable":"false","imageAssetUrl":"https://images.unsplash.com/photo-1495020689067-958852a7765e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60"},
+    getList();
+    List<CategorieModel> category = [];
+    final array1=[
+      {"categorieName": "General","isDisable":"false","imageAssetUrl":"https://images.unsplash.com/photo-1495020689067-958852a7765e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60"},
       {"categorieName": "Business","isDisable":"false","imageAssetUrl":"https://images.unsplash.com/photo-1507679799987-c73779587ccf?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1502&q=80"},
       {"categorieName": "Science","isDisable":"false","imageAssetUrl":"https://images.unsplash.com/photo-1507679799987-c73779587ccf?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1502&q=80"},
       {"categorieName": "Health","isDisable":"false","imageAssetUrl":"https://images.unsplash.com/photo-1507679799987-c73779587ccf?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1502&q=80"},
@@ -72,14 +78,37 @@ class SplashScreenState extends State<SplashScreen> {
       {"categorieName": "Technology","isDisable":"false","imageAssetUrl":"https://images.unsplash.com/photo-1519389950473-47ba0277781c?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1500&q=80"},
     ];
 
+
+
+    debugPrint("homeList:- ${stringData.length}");
     Timer(const Duration(seconds: 2),
             () =>
             Navigator.pushReplacement(context,
                 MaterialPageRoute(builder:
-                    (context) => islogged?ReorderedListView(list: array1):LoginPage()
+                    // (context) => WebscoketDemo()
+                    (context) => islogged ? ReorderedListView(list: array1, isSinglePage: true) : LoginPage()
                 )
             )
     );
+  }
+
+  void getList() async
+  {
+    final prefs = await SharedPreferences.getInstance();
+    // ###### to clear SharedPreferences cache  ######
+    // await prefs.clear();
+    var yourList = prefs.getStringList('imageList');
+
+    if (prefs.getString('catagoriesList') != null) {
+      debugPrint("catagoriesList:- ${prefs.getString('catagoriesList')}");
+    }
+    else{
+
+    }
+
+
+      // addToSP(_imageUris);
+    // }
   }
 
   Future<bool?> getLogged() async
