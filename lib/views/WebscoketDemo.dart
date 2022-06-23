@@ -60,8 +60,16 @@ class _MyHomePageState extends State<WebscoketDemo> {
     });
   }
 
+
+  @override
+  void deactivate() {
+    super.deactivate();
+    channel.sink.close();
+  }
+
   @override
   void dispose() {
+
     channel.sink.close();
     super.dispose();
   }
